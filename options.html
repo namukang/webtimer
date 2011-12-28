@@ -1,0 +1,60 @@
+<html>
+  <head>
+    <title>Web Timer Options</title>
+    <style type="text/css">
+      body {
+        margin: 25px;
+      }
+      #domains {
+      	height: 15em;
+      	width: 25em;
+      }
+    </style>
+  </head>
+  <script type="text/javascript">
+
+  // Saves options to localStorage.
+  function save_options() {
+    var domainsEl = document.getElementById("domains");
+    var domains = domainsEl.value;
+    localStorage["domains"] = domains;
+
+    // Update status to let user know options were saved.
+    var status = document.getElementById("status");
+    status.innerHTML = "Options Saved.";
+    setTimeout(function() {
+      status.innerHTML = "";
+    }, 750);
+  }
+
+  // Restores select box state to saved value from localStorage.
+  function restore_options() {
+    var domains = localStorage["domains"];
+    var domainsEl = document.getElementById("domains");
+    if (!domains) {
+      var default_domains = [
+        "facebook.com",
+        "gmail.com",
+        "reddit.com",
+        "twitter.com",
+        "tumblr.com",
+        "hulu.com"
+      ].join('\n');
+      domains = default_domains;
+    }
+    domainsEl.value = domains;
+  }
+
+  </script>
+
+  <body onload="restore_options()">
+    <h1>Web Timer Options</h1>
+    <h4>Sites to track:</h4>
+    <div>
+      <textarea id="domains"></textarea>
+    </div>
+    <br />
+    <button onclick="save_options()">Save</button>
+    <span id="status"></span>
+  </body>
+</html>
