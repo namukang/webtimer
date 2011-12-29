@@ -3,22 +3,71 @@
     <title>Web Timer Options</title>
     <style type="text/css">
       body {
-        margin: 25px;
+          margin: 15px;
+          font-family: helvetica, arial, sans-serif;
+          font-size: 13px;
+      }
+      #header {
+          padding: 1em;
+          padding-bottom: 2em;
+      }
+      #header h1 {
+          display: inline;
+          font-size: 156%;
+          padding-bottom: 43px;
+          padding-left: 75px;
+          padding-top: 30px;
+          background: url(icon_128.png) no-repeat;
+          background-size: 50px;
+          background-position: 1px 18px;
+      }
+      #settings {
+          margin: 6px 6px 0 6px;
+          padding: 10px;
+          color: #333;
+          border: 1px solid #DEDEDE;
+          -webkit-border-radius: 5px 5px;
+      }
+      #settings table {
+          font-size: 13px;
+      }
+      th, td {
+          vertical-align: top;
+      }
+      th {
+          text-align: right;
+          font-weight: bold;
+          white-space: nowrap;
+          padding: 12px 24px 12px 12px;
+      }
+      td {
+          padding: 12px;
       }
       #domains {
-      	height: 15em;
-      	width: 25em;
+          height: 15em;
+          width: 25em;
+      }
+      #footer {
+          margin: 10px;
+      }
+      #status {
+          margin-left: 10px;
+      }
+      .success {
+          color: green;
       }
     </style>
   </head>
   <script type="text/javascript">
+  var bg = chrome.extension.getBackgroundPage();
 
   // Saves options to localStorage.
   function save_options() {
+    // Save domains
     var domainsEl = document.getElementById("domains");
     var domains = domainsEl.value.split(/\r?\n/);
     var saved_domains = [];
-    // Get rid of random new lines
+    // Get rid of empty lines
     for (var i = 0; i < domains.length; i++) {
       var domain = domains[i];
       if (domain) {
@@ -28,11 +77,25 @@
     domainsEl.value = saved_domains.join('\n');
     localStorage["domains"] = domainsEl.value;
 
+    // Check checkboxes for erasing data
+    var today_data = document.getElementById("today-data");
+    if (today_data.checked) {
+      resetData(bg.ADDON.today);
+      today_data.checked = false;
+    }
+    var all_data = document.getElementById("all-data");
+    if (all_data.checked) {
+      resetData(bg.ADDON.all);
+      all_data.checked = false;
+    }
+
     // Update status to let user know options were saved.
     var status = document.getElementById("status");
     status.innerHTML = "Options Saved.";
+    status.className = "success";
     setTimeout(function() {
       status.innerHTML = "";
+      status.className = "";
     }, 750);
   }
 
@@ -41,23 +104,47 @@
     var domains = localStorage["domains"];
     var domainsEl = document.getElementById("domains");
     if (!domains) {
-      default_domains = chrome.extension.getBackgroundPage().DEFAULT_DOMAINS;
+      default_domains = bg.DEFAULT_DOMAINS;
       localStorage["domains"] = default_domains;
       domains = default_domains;
     }
     domainsEl.value = domains;
   }
-
+  function resetData(addon) {
+    var domains = localStorage["domains"].split(/\n/);
+    for (var i = 0; i < domains.length; i++) {
+      var domain = domains[i];
+      delete localStorage[domain + addon];
+    }
+  }
   </script>
 
   <body onload="restore_options()">
-    <h1>Web Timer Options</h1>
-    <h4>Sites to track:</h4>
-    <div>
-      <textarea id="domains"></textarea>
+    <div id="header">
+      <h1>Web Timer Options</h1>
     </div>
-    <br />
-    <button onclick="save_options()">Save</button>
-    <span id="status"></span>
+    <div id="settings">
+      <table>
+        <tbody>
+          <tr>
+            <th>Sites to Track</th>
+            <td><textarea id="domains"></textarea></td>
+          </tr>
+          <tr>
+            <th>Erase Data</th>
+            <td>
+              <input id="today-data" type="checkbox" />
+              <label for="today-data">Erase Data for Today</label>
+              <br />
+              <input id="all-data" type="checkbox" />
+              <label for="all-data">Erase Data for All Time</label>
+            </td>
+        </tbody>
+      </table>
+    </div>
+    <div id="footer">
+      <button onclick="save_options()">Save</button>
+      <span id="status"></span>
+    </div>
   </body>
 </html>

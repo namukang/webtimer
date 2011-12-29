@@ -152,24 +152,6 @@
         var table = new google.visualization.Table(document.getElementById('table_div'));
         table.draw(data);
       }
-      
-      function resetTodayData() {
-        resetData(bg.ADDON.today);
-        showToday();
-      }
-
-      function resetAllTimeData() {
-        resetData(bg.ADDON.all);
-        showAllTime();
-      }
-
-      function resetData(addon) {
-        var domains = localStorage["domains"].split(/\n/);
-        for (var i = 0; i < domains.length; i++) {
-          var domain = domains[i];
-          delete localStorage[domain + addon];
-        }
-      }
     </script>
   </head>
 
