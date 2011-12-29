@@ -17,16 +17,18 @@
         if (tab) {
           var domains = localStorage["domains"].split(/\n/);
           // Make sure 'today' is up-to-date
-          var today = new Date();
+          var todayStr = new Date().toLocaleDateString();
           var saved_day = localStorage["today"];
           if (!saved_day) {
-            localStorage["today"] = today.toLocaleDateString();
+            localStorage["today"] = todayStr;
           } else {
-            if (saved_day !== today.toLocaleDateString()) {
+            if (saved_day !== todayStr) {
               // Reset today's data
               for (var i = 0; i < domains.length; i++) {
                 delete localStorage[domains[i]];
               }
+              // Update date
+              localStorage["today"] = todayStr;
             }
           }
           // Update data
