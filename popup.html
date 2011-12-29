@@ -29,6 +29,15 @@
       .active {
           font-weight: bold;
       }
+      #nodata {
+          display: none;
+          color: red;
+          font-weight: bold;
+      }
+      #nodata a {
+          text-decoration: underline;
+          color: red;
+      }
     </style>
 
     <!--Load the AJAX API-->
@@ -75,21 +84,48 @@
         return timeStr;
       }
 
-      function showToday() {
+      // Show the data for the time period indicated by addon
+      function show(addon) {
+        // Get the domain data
+        var domains = localStorage["domains"].split(/\n/);
+        var chart_data = [];
+        var table_data = [];
+        for (var i = 0; i < domains.length; i++) {
+          var domain = domains[i];
+          var numSeconds = parseInt(localStorage[domain + addon]);
+          if (numSeconds && numSeconds > 0) {
+            var timeDesc = timeString(numSeconds);
+            chart_data.push([domain, numSeconds]);
+            table_data.push([domain, timeDesc]);
+          }
+        }
+
+        // Display help message if no data
+        if (chart_data.length === 0) {
+          document.getElementById("nodata").style.display = "inline";
+        } else {
+          document.getElementById("nodata").style.display = "none";
+        }
+
         // Draw the chart
-        drawChart(bg.ADDON.today);
+        drawChart(chart_data);
         // Draw the table
-        drawTable(bg.ADDON.today);
+        drawTable(table_data);
+      }
+
+      function showToday() {
+        var addon = bg.ADDON.today;
+        // Draw chart and table
+        show(addon);
         // Update nav
         document.getElementById('today').className = 'active';
         document.getElementById('all').className = '';
       }
 
       function showAllTime() {
-        // Draw the chart
-        drawChart(bg.ADDON.all);
-        // Draw the table
-        drawTable(bg.ADDON.all);
+        var addon = bg.ADDON.all;
+        // Draw chart and table
+        show(addon);
         // Update nav
         document.getElementById('today').className = '';
         document.getElementById('all').className = 'active';
@@ -98,23 +134,12 @@
       // Callback that creates and populates a data table, 
       // instantiates the pie chart, passes in the data and
       // draws it.
-      function drawChart(addon) {
-      // Get the domain data
-        var domains = localStorage["domains"].split(/\n/);
-        var domain_data = [];
-        for (var i = 0; i < domains.length; i++) {
-          var domain = domains[i];
-          var numSeconds = parseInt(localStorage[domain + addon]);
-          if (numSeconds && numSeconds > 0) {
-            domain_data.push([domain, numSeconds]);
-          }
-        }
-
+      function drawChart(chart_data) {
         // Create the data table.
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Domain');
         data.addColumn('number', 'Time');
-        data.addRows(domain_data);
+        data.addRows(chart_data);
 
         // Set chart options
         var options = {
@@ -132,22 +157,11 @@
         chart.draw(data, options);
       }
 
-      function drawTable(addon) {
-        var domains = localStorage["domains"].split(/\n/);
-        var domain_data = [];
-        for (var i = 0; i < domains.length; i++) {
-          var domain = domains[i];
-          var numSeconds = parseInt(localStorage[domain + addon]);
-          if (numSeconds && numSeconds > 0) {
-            var timeDesc = timeString(numSeconds);
-            domain_data.push([domain, timeDesc]);
-          }
-        }
-
+      function drawTable(table_data) {
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Domain');
         data.addColumn('string', 'Time Spent');
-        data.addRows(domain_data);
+        data.addRows(table_data);
 
         var table = new google.visualization.Table(document.getElementById('table_div'));
         table.draw(data);
@@ -163,6 +177,7 @@
     </div>
     <a id="options" onclick="showOptions()" href="#">Options</a>
     <div id="data">
+      <span id="nodata">Start collecting data by visiting the <a onclick="showOptions()" href="#">sites you're tracking</a>.</span>
       <div id="chart_div"></div>
       <div id="table_div"></div>
     </div>
