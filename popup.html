@@ -91,8 +91,7 @@
       function show(addon) {
         // Get the domain data
         var domains = localStorage["domains"].split(/\n/);
-        var chart_data = [];
-        var table_data = [];
+        var domain_data = [];
         for (var i = 0; i < domains.length; i++) {
           var domain = domains[i];
           var numSeconds;
@@ -110,23 +109,31 @@
                 continue;
               }
             }
-            var timeDesc = timeString(numSeconds);
-            chart_data.push([domain, numSeconds]);
-            table_data.push([domain, timeDesc]);
+            domain_data.push([domain, numSeconds]);
           }
         }
 
         // Display help message if no data
-        if (chart_data.length === 0) {
+        if (domain_data.length === 0) {
           document.getElementById("nodata").style.display = "inline";
         } else {
           document.getElementById("nodata").style.display = "none";
         }
 
         // Draw the chart
-        drawChart(chart_data);
+        drawChart(domain_data);
+
+        // Sort data by descending duration before drawing table
+        domain_data.sort(function (a, b) {
+          return b[1] - a[1];
+        });
+        // Convert chart data to table data
+        for (var i = 0; i < domain_data.length; i++) {
+          var numSeconds = domain_data[i][1];
+          domain_data[i][1] = timeString(numSeconds);
+        }
         // Draw the table
-        drawTable(table_data, addon);
+        drawTable(domain_data, addon);
       }
 
       function showToday() {
@@ -199,8 +206,11 @@
         data.addColumn('string', "Time Spent (" + timeDesc + ")");
         data.addRows(table_data);
 
+        var options = {
+          sort: 'disable'
+        }
         var table = new google.visualization.Table(document.getElementById('table_div'));
-        table.draw(data);
+        table.draw(data, options);
       }
     </script>
   </head>
