@@ -61,26 +61,31 @@
 
     // Update the data
     function updateData() {
-      chrome.tabs.getSelected(null, function (tab) {
-        // Make sure 'today' is up-to-date
-        checkDate();
-        // Update data if URL is being tracked
-        var domain = longestMatch(tab.url);
-        if (domain) {
-          // Time tracked for today
-          var todayTime = parseInt(localStorage[domain + ADDON.today]);
-          if (todayTime) {
-            localStorage[domain + ADDON.today] = todayTime + UPDATE_INTERVAL;
-          } else {
-            localStorage[domain + ADDON.today] = UPDATE_INTERVAL;
-          }
-          // Time tracked for all time
-          var totalTime = parseInt(localStorage[domain + ADDON.all]);
-          if (totalTime) {
-            localStorage[domain + ADDON.all] = totalTime + UPDATE_INTERVAL;
-          } else {
-            localStorage[domain + ADDON.all] = UPDATE_INTERVAL;
-          }
+      // Don't count time if system has been idle for 60 seconds
+      chrome.idle.queryState(60, function (state) {
+        if (state === "active") {
+          chrome.tabs.getSelected(null, function (tab) {
+            // Make sure 'today' is up-to-date
+            checkDate();
+            // Update data if URL is being tracked
+            var domain = longestMatch(tab.url);
+            if (domain) {
+              // Time tracked for today
+              var todayTime = parseInt(localStorage[domain + ADDON.today]);
+              if (todayTime) {
+                localStorage[domain + ADDON.today] = todayTime + UPDATE_INTERVAL;
+              } else {
+                localStorage[domain + ADDON.today] = UPDATE_INTERVAL;
+              }
+              // Time tracked for all time
+              var totalTime = parseInt(localStorage[domain + ADDON.all]);
+              if (totalTime) {
+                localStorage[domain + ADDON.all] = totalTime + UPDATE_INTERVAL;
+              } else {
+                localStorage[domain + ADDON.all] = UPDATE_INTERVAL;
+              }
+            }
+          });
         }
       });
     }
