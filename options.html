@@ -70,6 +70,8 @@
 
   // Saves options to localStorage.
   function save_options() {
+    var old_domains = localStorage["domains"].split(/\n/);
+    var new_domains = {};
     // Save domains
     var domainsEl = document.getElementById("domains");
     var domains = domainsEl.value.split(/\r?\n/);
@@ -79,10 +81,20 @@
       var domain = domains[i];
       if (domain) {
         saved_domains.push(domain);
+        new_domains[domain] = true;
       }
     }
     domainsEl.value = saved_domains.join('\n');
     localStorage["domains"] = domainsEl.value;
+
+    // Remove data for domains that were removed
+    for (var i = 0; i < old_domains.length; i++) {
+      var old_domain = old_domains[i];
+      if (!(old_domain in new_domains)) {
+        delete localStorage[old_domain + bg.ADDON.today];
+        delete localStorage[old_domain + bg.ADDON.all];
+      }
+    }
 
     // Check checkboxes for erasing data
     var today_data = document.getElementById("today-data");
