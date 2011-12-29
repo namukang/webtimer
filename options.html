@@ -86,6 +86,8 @@
     var all_data = document.getElementById("all-data");
     if (all_data.checked) {
       resetData(bg.ADDON.all);
+      // Reset data for average stats
+      localStorage["num_days"] = 1;
       all_data.checked = false;
     }
 
@@ -140,7 +142,7 @@
               <label for="today-data">Erase Data for Today</label>
               <br />
               <input id="all-data" type="checkbox" />
-              <label for="all-data">Erase Data for All Time</label>
+              <label for="all-data">Erase Data for Average and All Time</label>
             </td>
         </tbody>
       </table>
