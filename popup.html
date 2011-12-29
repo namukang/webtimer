@@ -3,9 +3,10 @@
     <!--Load the AJAX API-->
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
+      var bg = chrome.extension.getBackgroundPage();
+
       // Load the Visualization API and the piechart package.
       google.load('visualization', '1.0', {'packages':['corechart', 'table']});
-      
       // Set a callback to run when the Google Visualization API is loaded.
       google.setOnLoadCallback(drawToday);
 
@@ -38,90 +39,36 @@
 
       function drawToday() {
         // Draw the chart
-        drawTodayChart();
+        drawChart(bg.ADDON.today, "Today");
         // Draw the table
-        drawTodayTable();
+        drawTable(bg.ADDON.today);
         // Update reset link
         var resetLink = document.getElementById('reset');
         resetLink.innerHTML = "Reset Today";
         resetLink.onclick = resetTodayData;
       }
 
-      // Callback that creates and populates a data table, 
-      // instantiates the pie chart, passes in the data and
-      // draws it.
-      function drawTodayChart() {
-        // Get the domain data
-        var domains = localStorage["domains"].split(/\n/);
-        var domain_data = [];
-        for (var i = 0; i < domains.length; i++) {
-          var domain = domains[i];
-          var numSeconds = parseInt(localStorage[domain]);
-          if (numSeconds && numSeconds > 0) {
-            domain_data.push([domain, numSeconds]);
-          }
-        }
-
-        // Create the data table.
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Domain');
-        data.addColumn('number', 'Time');
-        data.addRows(domain_data);
-
-        // Set chart options
-        var options = {
-          title: 'Today',
-          tooltip: {
-            text: 'percentage'
-          },
-          chartArea: {
-            width: 400,
-            height: 170
-          }
-        };
-
-        // Instantiate and draw our chart, passing in some options.
-        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-        chart.draw(data, options);
-      }
-
-      function drawTodayTable() {
-        var domains = localStorage["domains"].split(/\n/);
-        var domain_data = [];
-        for (var i = 0; i < domains.length; i++) {
-          var domain = domains[i];
-          var numSeconds = parseInt(localStorage[domain]);
-          if (numSeconds && numSeconds > 0) {
-            var timeDesc = timeString(numSeconds);
-            domain_data.push([domain, timeDesc]);
-          }
-        }
-
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Domain');
-        data.addColumn('string', 'Time Spent');
-        data.addRows(domain_data);
-
-        var table = new google.visualization.Table(document.getElementById('table_div'));
-        table.draw(data);
-      }
-      
       function drawAllTime() {
-        drawAllTimeChart();
-        drawAllTimeTable();
+        // Draw the chart
+        drawChart(bg.ADDON.all, "All Time");
+        // Draw the table
+        drawTable(bg.ADDON.all);
         // Update reset link
         var resetLink = document.getElementById('reset');
         resetLink.innerHTML = "Reset All Time";
         resetLink.onclick = resetAllTimeData;
       }
 
-      function drawAllTimeChart() {
-        // Get the domain data
+      // Callback that creates and populates a data table, 
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function drawChart(addon, title) {
+      // Get the domain data
         var domains = localStorage["domains"].split(/\n/);
         var domain_data = [];
         for (var i = 0; i < domains.length; i++) {
           var domain = domains[i];
-          var numSeconds = parseInt(localStorage[domain + "_all"]);
+          var numSeconds = parseInt(localStorage[domain + addon]);
           if (numSeconds && numSeconds > 0) {
             domain_data.push([domain, numSeconds]);
           }
@@ -135,7 +82,7 @@
 
         // Set chart options
         var options = {
-          title: 'All Time',
+          title: title,
           tooltip: {
             text: 'percentage'
           },
@@ -150,12 +97,12 @@
         chart.draw(data, options);
       }
 
-      function drawAllTimeTable() {
+      function drawTable(addon) {
         var domains = localStorage["domains"].split(/\n/);
         var domain_data = [];
         for (var i = 0; i < domains.length; i++) {
           var domain = domains[i];
-          var numSeconds = parseInt(localStorage[domain + "_all"]);
+          var numSeconds = parseInt(localStorage[domain + addon]);
           if (numSeconds && numSeconds > 0) {
             var timeDesc = timeString(numSeconds);
             domain_data.push([domain, timeDesc]);
@@ -172,23 +119,23 @@
       }
       
       function resetTodayData() {
-        var domains = localStorage["domains"].split(/\n/);
-        for (var i = 0; i < domains.length; i++) {
-          var domain = domains[i];
-          delete localStorage[domain];
-        }
-        drawTodayChart();
+        resetData(bg.ADDON.today);
+        drawToday();
       }
 
       function resetAllTimeData() {
+        resetData(bg.ADDON.all);
+        drawAllTime();
+      }
+
+      function resetData(addon) {
         var domains = localStorage["domains"].split(/\n/);
         for (var i = 0; i < domains.length; i++) {
           var domain = domains[i];
-          delete localStorage[domain + "_all"];
+          delete localStorage[domain + addon];
         }
-        drawAllTimeChart();
       }
-      </script>
+    </script>
   </head>
 
   <body style="width:400px">
