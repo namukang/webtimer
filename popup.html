@@ -9,6 +9,33 @@
       // Set a callback to run when the Google Visualization API is loaded.
       google.setOnLoadCallback(drawTodayChart);
 
+      // Converts duration to String
+      function timeString(numSeconds) {
+        var remainder = numSeconds;
+        var timeStr = "";
+        var timeTerms = {
+          hour: 3600,
+          minute: 60,
+          second: 1
+        };
+        for (term in timeTerms) {
+          var divisor = timeTerms[term];
+          if (remainder >= divisor) {
+            var numUnits = Math.floor(remainder / divisor);
+            timeStr += numUnits + " " + term;
+            // Make it plural
+            if (numUnits > 1) {
+              timeStr += "s";
+            }
+            remainder = remainder % divisor;
+            if (remainder) {
+              timeStr += " and "
+            }
+          }
+        }
+        return timeStr;
+      }
+
       // Callback that creates and populates a data table, 
       // instantiates the pie chart, passes in the data and
       // draws it.
@@ -20,7 +47,8 @@
           var domain = domains[i];
           var numSeconds = parseInt(localStorage[domain]);
           if (numSeconds && numSeconds > 0) {
-            domain_data.push([domain, numSeconds]);
+            var timeDesc = timeString(numSeconds);
+            domain_data.push([domain + " (" + timeDesc + ")", numSeconds]);
           }
         }
 
@@ -55,7 +83,8 @@
           var domain = domains[i];
           var numSeconds = parseInt(localStorage[domain + "_all"]);
           if (numSeconds && numSeconds > 0) {
-            domain_data.push([domain, numSeconds]);
+            var timeDesc = timeString(numSeconds);
+            domain_data.push([domain + " (" + timeDesc + ")", numSeconds]);
           }
         }
 
