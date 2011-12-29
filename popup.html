@@ -3,19 +3,18 @@
     <!--Load the AJAX API-->
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
-      
       // Load the Visualization API and the piechart package.
       google.load('visualization', '1.0', {'packages':['corechart']});
       
       // Set a callback to run when the Google Visualization API is loaded.
-      google.setOnLoadCallback(drawChart);
-      
+      google.setOnLoadCallback(drawTodayChart);
+
       // Callback that creates and populates a data table, 
       // instantiates the pie chart, passes in the data and
       // draws it.
-      function drawChart() {
+      function drawTodayChart() {
         // Get the domain data
-        var domains = localStorage["domains"].split(/\r?\n/);
+        var domains = localStorage["domains"].split(/\n/);
         var domain_data = [];
         for (var i = 0; i < domains.length; i++) {
           var domain = domains[i];
@@ -27,26 +26,88 @@
 
         // Create the data table.
         var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Topping');
-        data.addColumn('number', 'Slices');
+        data.addColumn('string', 'Domain');
+        data.addColumn('number', 'Time');
         data.addRows(domain_data);
 
         // Set chart options
         var options = {
-          'title': 'Web Timer',
-          'width': 400,
+          'title': 'Today',
+          'width': 600,
           'height': 300
         };
 
         // Instantiate and draw our chart, passing in some options.
         var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
         chart.draw(data, options);
+
+        // Update reset link
+        var resetLink = document.getElementById('reset');
+        resetLink.innerHTML = "Reset Today";
+        resetLink.onclick = resetTodayData;
       }
-    </script>
+      
+      function drawAllTimeChart() {
+        // Get the domain data
+        var domains = localStorage["domains"].split(/\n/);
+        var domain_data = [];
+        for (var i = 0; i < domains.length; i++) {
+          var domain = domains[i];
+          var numSeconds = parseInt(localStorage[domain + "_all"]);
+          if (numSeconds && numSeconds > 0) {
+            domain_data.push([domain, numSeconds]);
+          }
+        }
+
+        // Create the data table.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Domain');
+        data.addColumn('number', 'Time');
+        data.addRows(domain_data);
+
+        // Set chart options
+        var options = {
+          'title': 'All Time',
+          'width': 600,
+          'height': 300
+        };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+
+        // Update reset link
+        var resetLink = document.getElementById('reset');
+        resetLink.innerHTML = "Reset All Time";
+        resetLink.onclick = resetAllTimeData;
+      }
+
+      function resetTodayData() {
+        var domains = localStorage["domains"].split(/\n/);
+        for (var i = 0; i < domains.length; i++) {
+          var domain = domains[i];
+          delete localStorage[domain];
+        }
+        drawTodayChart();
+      }
+
+      function resetAllTimeData() {
+        var domains = localStorage["domains"].split(/\n/);
+        for (var i = 0; i < domains.length; i++) {
+          var domain = domains[i];
+          delete localStorage[domain + "_all"];
+        }
+        drawAllTimeChart();
+      }
+      </script>
   </head>
 
   <body>
-    <!--Div that will hold the pie chart-->
+    <div id="view_options" style="float:right">
+      <button onclick="drawTodayChart()">Today</button>
+      <button onclick="drawAllTimeChart()">All Time</button>
+    </div>
+    <a id="reset" href="#">Reset Today</a>
     <div id="chart_div"></div>
   </body>
 </html>

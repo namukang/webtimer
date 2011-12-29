@@ -16,8 +16,17 @@
   // Saves options to localStorage.
   function save_options() {
     var domainsEl = document.getElementById("domains");
-    var domains = domainsEl.value;
-    localStorage["domains"] = domains;
+    var domains = domainsEl.value.split(/\r?\n/);
+    var saved_domains = [];
+    // Get rid of random new lines
+    for (var i = 0; i < domains.length; i++) {
+      var domain = domains[i];
+      if (domain) {
+        saved_domains.push(domain);
+      }
+    }
+    domainsEl.value = saved_domains.join('\n');
+    localStorage["domains"] = domainsEl.value;
 
     // Update status to let user know options were saved.
     var status = document.getElementById("status");
@@ -32,14 +41,8 @@
     var domains = localStorage["domains"];
     var domainsEl = document.getElementById("domains");
     if (!domains) {
-      var default_domains = [
-        "facebook.com",
-        "gmail.com",
-        "reddit.com",
-        "twitter.com",
-        "tumblr.com",
-        "hulu.com"
-      ].join('\n');
+      default_domains = chrome.extension.getBackgroundPage().DEFAULT_DOMAINS;
+      localStorage["domains"] = default_domains;
       domains = default_domains;
     }
     domainsEl.value = domains;

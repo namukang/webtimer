@@ -1,2 +1,60 @@
 <html>
+  <script type="text/javascript">
+    var DEFAULT_DOMAINS = [
+      "facebook.com",
+      "mail.google.com",
+      "reddit.com",
+      "twitter.com",
+      "tumblr.com",
+      "youtube.com",
+      "hulu.com"
+    ].join('\n');
+    if (!localStorage["domains"]) {
+      localStorage["domains"] = DEFAULT_DOMAINS;
+    }
+    function updateData() {
+      chrome.tabs.getSelected(null, function (tab) {
+        if (tab) {
+          var domains = localStorage["domains"].split(/\n/);
+          // Make sure 'today' is up-to-date
+          var today = new Date();
+          var saved_day = localStorage["today"];
+          if (!saved_day) {
+            localStorage["today"] = today.toLocaleDateString();
+          } else {
+            if (saved_day !== today.toLocaleDateString()) {
+              // Reset today's data
+              for (var i = 0; i < domains.length; i++) {
+                delete localStorage[domains[i]];
+              }
+            }
+          }
+          // Update data
+          for (var i = 0; i < domains.length; i++) {
+            var domain = domains[i];
+            // Make sure current URL is being tracked
+            if (tab.url.match(domain)) {
+              // Time tracked for today
+              var todayTime = parseInt(localStorage[domain]);
+              if (todayTime) {
+                localStorage[domain] = todayTime + 1;
+              } else {
+                localStorage[domain] = 1;
+              }
+              // Time tracked for all time
+              var totalTime = parseInt(localStorage[domain + "_all"]);
+              if (totalTime) {
+                localStorage[domain + "_all"] = totalTime + 1;
+              } else {
+                localStorage[domain + "_all"] = 1;
+              }
+              break;
+            }
+          }
+        }
+      });
+    }
+    // Update timer data every second
+    setInterval(updateData, 1000);
+  </script>
 </html>
