@@ -3,21 +3,22 @@
     <style type="text/css">
       body {
           width: 400px;
-          font-family: arial, sans-serif;
+          font-family: helvetica, arial, sans-serif;
           font-size: 13px;
       }
       #nav {
           float: right;
       }
-      #nav a {
+      a {
           text-decoration: none;
           color: black;
       }
-      #reset {
+      #options {
           font-weight: bold;
           font-size: 10px;
-          text-decoration: none;
-          color: red;
+      }
+      #options:hover {
+          text-decoration: underline;
       }
       #data {
           margin-top: 10px;
@@ -39,6 +40,13 @@
       google.load('visualization', '1.0', {'packages':['corechart', 'table']});
       // Set a callback to run when the Google Visualization API is loaded.
       google.setOnLoadCallback(showToday);
+
+      // Show options in a new tab
+      function showOptions() {
+        chrome.tabs.create({
+          url: 'options.html'
+        });
+      }
 
       // Converts duration to String
       function timeString(numSeconds) {
@@ -72,10 +80,6 @@
         drawChart(bg.ADDON.today);
         // Draw the table
         drawTable(bg.ADDON.today);
-        // Update reset link
-        var resetLink = document.getElementById('reset');
-        resetLink.innerHTML = "Reset Today";
-        resetLink.onclick = resetTodayData;
         // Update nav
         document.getElementById('today').className = 'active';
         document.getElementById('all').className = '';
@@ -86,10 +90,6 @@
         drawChart(bg.ADDON.all);
         // Draw the table
         drawTable(bg.ADDON.all);
-        // Update reset link
-        var resetLink = document.getElementById('reset');
-        resetLink.innerHTML = "Reset All Time";
-        resetLink.onclick = resetAllTimeData;
         // Update nav
         document.getElementById('today').className = '';
         document.getElementById('all').className = 'active';
@@ -179,7 +179,7 @@
       &nbsp;|&nbsp;
       <a id="all" onclick="showAllTime()" href="#">All Time</a>
     </div>
-    <a id="reset" href="#">Reset Today</a>
+    <a id="options" onclick="showOptions()" href="#">Options</a>
     <div id="data">
       <div id="chart_div"></div>
       <div id="table_div"></div>
