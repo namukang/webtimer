@@ -1,5 +1,35 @@
 <html>
   <head>
+    <style type="text/css">
+      body {
+          width: 400px;
+          font-family: arial, sans-serif;
+          font-size: 13px;
+      }
+      #nav {
+          float: right;
+      }
+      #nav a {
+          text-decoration: none;
+          color: black;
+      }
+      #reset {
+          font-weight: bold;
+          font-size: 10px;
+          text-decoration: none;
+          color: red;
+      }
+      #data {
+          margin-top: 10px;
+      }
+      #table_div {
+          margin-top: 15px;
+      }
+      .active {
+          font-weight: bold;
+      }
+    </style>
+
     <!--Load the AJAX API-->
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
@@ -8,7 +38,7 @@
       // Load the Visualization API and the piechart package.
       google.load('visualization', '1.0', {'packages':['corechart', 'table']});
       // Set a callback to run when the Google Visualization API is loaded.
-      google.setOnLoadCallback(drawToday);
+      google.setOnLoadCallback(showToday);
 
       // Converts duration to String
       function timeString(numSeconds) {
@@ -37,32 +67,38 @@
         return timeStr;
       }
 
-      function drawToday() {
+      function showToday() {
         // Draw the chart
-        drawChart(bg.ADDON.today, "Today");
+        drawChart(bg.ADDON.today);
         // Draw the table
         drawTable(bg.ADDON.today);
         // Update reset link
         var resetLink = document.getElementById('reset');
         resetLink.innerHTML = "Reset Today";
         resetLink.onclick = resetTodayData;
+        // Update nav
+        document.getElementById('today').className = 'active';
+        document.getElementById('all').className = '';
       }
 
-      function drawAllTime() {
+      function showAllTime() {
         // Draw the chart
-        drawChart(bg.ADDON.all, "All Time");
+        drawChart(bg.ADDON.all);
         // Draw the table
         drawTable(bg.ADDON.all);
         // Update reset link
         var resetLink = document.getElementById('reset');
         resetLink.innerHTML = "Reset All Time";
         resetLink.onclick = resetAllTimeData;
+        // Update nav
+        document.getElementById('today').className = '';
+        document.getElementById('all').className = 'active';
       }
 
       // Callback that creates and populates a data table, 
       // instantiates the pie chart, passes in the data and
       // draws it.
-      function drawChart(addon, title) {
+      function drawChart(addon) {
       // Get the domain data
         var domains = localStorage["domains"].split(/\n/);
         var domain_data = [];
@@ -82,13 +118,12 @@
 
         // Set chart options
         var options = {
-          title: title,
           tooltip: {
             text: 'percentage'
           },
           chartArea: {
             width: 400,
-            height: 170
+            height: 180
           }
         };
 
@@ -120,12 +155,12 @@
       
       function resetTodayData() {
         resetData(bg.ADDON.today);
-        drawToday();
+        showToday();
       }
 
       function resetAllTimeData() {
         resetData(bg.ADDON.all);
-        drawAllTime();
+        showAllTime();
       }
 
       function resetData(addon) {
@@ -138,15 +173,16 @@
     </script>
   </head>
 
-  <body style="width:400px">
-    <div id="view_options" style="float:right">
-      <button onclick="drawToday()">Today</button>
-      <button onclick="drawAllTime()">All Time</button>
+  <body>
+    <div id="nav">
+      <a id="today" onclick="showToday()" href="#">Today</a>
+      &nbsp;|&nbsp;
+      <a id="all" onclick="showAllTime()" href="#">All Time</a>
     </div>
     <a id="reset" href="#">Reset Today</a>
-    <div style="margin-top:10px" id="data">
+    <div id="data">
       <div id="chart_div"></div>
-      <div style="margin-top:15px" id="table_div"></div>
+      <div id="table_div"></div>
     </div>
   </body>
 </html>
