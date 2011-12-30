@@ -92,7 +92,7 @@
         // Get the domain data
         var domains = localStorage["domains"].split(/\n/);
         // Add "other" category to domain data
-        domains.push(bg.OTHER);
+        domains.unshift(bg.OTHER);
         var domain_data = [];
         for (var i = 0; i < domains.length; i++) {
           var domain = domains[i];

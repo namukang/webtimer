@@ -91,6 +91,13 @@
     for (var i = 0; i < old_domains.length; i++) {
       var old_domain = old_domains[i];
       if (!(old_domain in new_domains)) {
+        // Add times no longer being tracked to "other" category
+        localStorage[bg.OTHER + bg.ADDON.today] =
+          parseInt(localStorage[bg.OTHER + bg.ADDON.today]) +
+          parseInt(localStorage[old_domain + bg.ADDON.today]);
+        localStorage[bg.OTHER + bg.ADDON.all] =
+          parseInt(localStorage[bg.OTHER + bg.ADDON.all]) +
+          parseInt(localStorage[old_domain + bg.ADDON.all]);
         delete localStorage[old_domain + bg.ADDON.today];
         delete localStorage[old_domain + bg.ADDON.all];
       }
