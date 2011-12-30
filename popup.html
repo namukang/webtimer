@@ -115,13 +115,9 @@
           }
         }
 
-        // Don't show data if data is only for "other" category
-        if (domain_data.length === 1 && domain_data[0][0] === bg.OTHER) {
-          domain_data = [];
-        }
-
-        // Display help message if no data
-        if (domain_data.length === 0) {
+        // Display help message if no data or data is only for "other" category
+        var only_other = (domain_data.length === 1 && domain_data[0][0] === bg.OTHER);
+        if (domain_data.length === 0 || only_other) {
           document.getElementById("nodata").style.display = "inline";
         } else {
           document.getElementById("nodata").style.display = "none";
@@ -232,7 +228,7 @@
     </div>
     <a id="options" onclick="showOptions()" href="#">Options</a>
     <div id="data">
-      <span id="nodata">Start collecting data by visiting the <a onclick="showOptions()" href="#">sites you're tracking</a>.</span>
+      <span id="nodata">Start collecting useful data by visiting the <a onclick="showOptions()" href="#">sites you're tracking</a>.</span>
       <div id="chart_div"></div>
       <div id="table_div"></div>
     </div>
