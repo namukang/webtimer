@@ -92,12 +92,16 @@
       var old_domain = old_domains[i];
       if (!(old_domain in new_domains)) {
         // Add times no longer being tracked to "other" category
-        localStorage[bg.OTHER + bg.ADDON.today] =
-          parseInt(localStorage[bg.OTHER + bg.ADDON.today]) +
-          parseInt(localStorage[old_domain + bg.ADDON.today]);
-        localStorage[bg.OTHER + bg.ADDON.all] =
-          parseInt(localStorage[bg.OTHER + bg.ADDON.all]) +
-          parseInt(localStorage[old_domain + bg.ADDON.all]);
+        var old_today = parseInt(localStorage[old_domain + bg.ADDON.today]);
+        if (old_today) {
+          localStorage[bg.OTHER + bg.ADDON.today] =
+            parseInt(localStorage[bg.OTHER + bg.ADDON.today]) + old_today;
+        }
+        var old_all = parseInt(localStorage[old_domain + bg.ADDON.all]);
+        if (old_all) {
+          localStorage[bg.OTHER + bg.ADDON.all] =
+            parseInt(localStorage[bg.OTHER + bg.ADDON.all]) + old_all;
+        }
         delete localStorage[old_domain + bg.ADDON.today];
         delete localStorage[old_domain + bg.ADDON.all];
       }

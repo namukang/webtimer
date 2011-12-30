@@ -115,6 +115,11 @@
           }
         }
 
+        // Don't show data if data is only for "other" category
+        if (domain_data.length === 1 && domain_data[0][0] === bg.OTHER) {
+          domain_data = [];
+        }
+
         // Display help message if no data
         if (domain_data.length === 0) {
           document.getElementById("nodata").style.display = "inline";
