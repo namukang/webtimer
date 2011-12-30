@@ -37,10 +37,15 @@
         if (!saved_day) {
           localStorage["num_days"] = 1;
         } else {
-          localStorage["num_days"] += 1;
+          localStorage["num_days"] = parseInt(localStorage["num_days"]) + 1;
         }
         // Update date
         localStorage["date"] = todayStr;
+      }
+
+      // REMOVE ME
+      if (localStorage["num_days"] === "11") {
+        localStorage["num_days"] = 2;
       }
     }
 
