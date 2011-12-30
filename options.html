@@ -137,6 +137,8 @@
       var domain = domains[i];
       delete localStorage[domain + addon];
     }
+    // Delete "other" category
+    delete localStorage[bg.OTHER + addon];
   }
   </script>
 

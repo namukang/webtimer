@@ -18,9 +18,24 @@
       average: "_avg",
       all: "_all"
     };
+    // String representation for "other" category
+    var OTHER = "Other";
 
-    if (!localStorage["domains"]) {
-      localStorage["domains"] = DEFAULT_DOMAINS;
+    setDefaults();
+    // Set default settings
+    function setDefaults() {
+      // Set default domains
+      if (!localStorage["domains"]) {
+        localStorage["domains"] = DEFAULT_DOMAINS;
+      }
+      // Set number of days Web Timer has been used
+      if (!localStorage["num_days"]) {
+        localStorage["num_days"] = 1;
+      }
+      // Set date
+      if (!localStorage["date"]) {
+        localStorage["date"] = new Date().toLocaleDateString();
+      }
     }
 
     // Check to make sure data is kept for the same day
@@ -34,11 +49,7 @@
           delete localStorage[domains[i] + ADDON.today];
         }
         // Keep track of number of days web timer has been used
-        if (!saved_day) {
-          localStorage["num_days"] = 1;
-        } else {
-          localStorage["num_days"] = parseInt(localStorage["num_days"]) + 1;
-        }
+        localStorage["num_days"] = parseInt(localStorage["num_days"]) + 1;
         // Update date
         localStorage["date"] = todayStr;
       }
@@ -75,8 +86,8 @@
               chrome.tabs.getSelected(null, function (tab) {
                 // Make sure 'today' is up-to-date
                 checkDate();
-                // Update data if URL is being tracked
                 var domain = longestMatch(tab.url);
+                // Check if domain is being tracked
                 if (domain) {
                   // Time tracked for today
                   var todayTime = parseInt(localStorage[domain + ADDON.today]);
@@ -91,6 +102,22 @@
                     localStorage[domain + ADDON.all] = totalTime + UPDATE_INTERVAL;
                   } else {
                     localStorage[domain + ADDON.all] = UPDATE_INTERVAL;
+                  }
+                } else {
+                  // Track time spent on all non-tracked websites
+                  // Time tracked for today
+                  var todayTime = parseInt(localStorage[OTHER + ADDON.today]);
+                  if (todayTime) {
+                    localStorage[OTHER + ADDON.today] = todayTime + UPDATE_INTERVAL;
+                  } else {
+                    localStorage[OTHER + ADDON.today] = UPDATE_INTERVAL;
+                  }
+                  // Time tracked for all time
+                  var totalTime = parseInt(localStorage[OTHER + ADDON.all]);
+                  if (totalTime) {
+                    localStorage[OTHER + ADDON.all] = totalTime + UPDATE_INTERVAL;
+                  } else {
+                    localStorage[OTHER + ADDON.all] = UPDATE_INTERVAL;
                   }
                 }
               });
