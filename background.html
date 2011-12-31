@@ -1,32 +1,22 @@
 <html>
   <script type="text/javascript">
-    // Default domains to check
-    var DEFAULT_DOMAINS = [
-      "facebook.com",
-      "mail.google.com",
-      "reddit.com",
-      "twitter.com",
-      "tumblr.com",
-      "youtube.com",
-      "hulu.com"
-    ].join('\n');
     // Interval (in seconds) to update timer
     var UPDATE_INTERVAL = 3;
-    // Add-ons to domains when saving their times
-    var ADDON = {
-      today: "",
-      average: "_avg",
-      all: "_all"
+    // Types to view data
+    var TYPE = {
+      today: "today",
+      average: "average",
+      all: "all"
     };
-    // String representation for "other" category
-    var OTHER = "Other";
+    // Number of items to show in chart
+    var CHART_LIMIT = 7;
 
     setDefaults();
     // Set default settings
     function setDefaults() {
-      // Set default domains
-      if (!localStorage["domains"]) {
-        localStorage["domains"] = DEFAULT_DOMAINS;
+      // Set blacklist
+      if (!localStorage["blacklist"]) {
+        localStorage["blacklist"] = JSON.stringify(["example.com"]);
       }
       // Set number of days Web Timer has been used
       if (!localStorage["num_days"]) {
@@ -36,47 +26,59 @@
       if (!localStorage["date"]) {
         localStorage["date"] = new Date().toLocaleDateString();
       }
+      // Set domains seen before
+      if (!localStorage["domains"]) {
+        localStorage["domains"] = JSON.stringify({});
+      }
     }
 
     // Check to make sure data is kept for the same day
     function checkDate() {
-      var domains = localStorage["domains"].split(/\n/);
       var todayStr = new Date().toLocaleDateString();
       var saved_day = localStorage["date"];
       if (saved_day !== todayStr) {
         // Reset today's data
-        for (var i = 0; i < domains.length; i++) {
-          delete localStorage[domains[i] + ADDON.today];
+        var domains = JSON.parse(localStorage["domains"]);
+        for (var domain in domains) {
+          var domain_data = JSON.parse(localStorage[domain]);
+          domain_data.today = 0;
+          localStorage[domain] = JSON.stringify(domain_data);
         }
         // Keep track of number of days web timer has been used
         localStorage["num_days"] = parseInt(localStorage["num_days"]) + 1;
         // Update date
         localStorage["date"] = todayStr;
       }
-
-      // REMOVE ME
-      if (localStorage["num_days"] === "11") {
-        localStorage["num_days"] = 2;
-      }
     }
 
-    // Finds the longest match in list of domains being tracked for current URL
-    function longestMatch(url) {
-      var max = 0;
-      var match = null;
-      var domains = localStorage["domains"].split(/\n/);
-      for (var i = 0; i < domains.length; i++) {
-        var domain = domains[i];
-        if (url.match(domain) && domain.length > max) {
-          match = domain;
-          max = domain.length;
+    // Extract the domain from the url
+    // e.g. http://google.com/ -> google.com
+    function extractDomain(url) {
+      var re = /:\/\/(www\.)?(.+?)\//;
+      return url.match(re)[2];
+    }
+
+    function inBlacklist(url) {
+      if (!url.match(/^http/)) {
+        return true;
+      }
+      var blacklist = JSON.parse(localStorage["blacklist"]);
+      for (var i = 0; i < blacklist.length; i++) {
+        if (url.match(blacklist[i])) {
+          return true;
         }
       }
-      return match;
+      return false;
     }
 
     // Update the data
     function updateData() {
+      // FIXME: REMOVE ME!
+      if (!localStorage["version"]) {
+        localStorage.clear();
+        setDefaults();
+        localStorage["version"] = "1.2.0";
+      }
       // Only count time if Chrome has focus
       chrome.windows.getLastFocused(function (window) {
         if (window.focused) {
@@ -86,39 +88,27 @@
               chrome.tabs.getSelected(null, function (tab) {
                 // Make sure 'today' is up-to-date
                 checkDate();
-                var domain = longestMatch(tab.url);
-                // Check if domain is being tracked
-                if (domain) {
-                  // Time tracked for today
-                  var todayTime = parseInt(localStorage[domain + ADDON.today]);
-                  if (todayTime) {
-                    localStorage[domain + ADDON.today] = todayTime + UPDATE_INTERVAL;
-                  } else {
-                    localStorage[domain + ADDON.today] = UPDATE_INTERVAL;
+                if (!inBlacklist(tab.url)) {
+                  var domain = extractDomain(tab.url);
+                  // Add domain to domain list if not already present
+                  var domains = JSON.parse(localStorage["domains"]);
+                  if (!(domain in domains)) {
+                    // FIXME: Using object as hash set feels hacky
+                    domains[domain] = 1;
+                    localStorage["domains"] = JSON.stringify(domains);
                   }
-                  // Time tracked for all time
-                  var totalTime = parseInt(localStorage[domain + ADDON.all]);
-                  if (totalTime) {
-                    localStorage[domain + ADDON.all] = totalTime + UPDATE_INTERVAL;
+                  var domain_data;
+                  if (localStorage[domain]) {
+                    domain_data = JSON.parse(localStorage[domain]);
                   } else {
-                    localStorage[domain + ADDON.all] = UPDATE_INTERVAL;
+                    domain_data = {
+                      today: 0,
+                      all: 0
+                    };
                   }
-                } else {
-                  // Track time spent on all non-tracked websites
-                  // Time tracked for today
-                  var todayTime = parseInt(localStorage[OTHER + ADDON.today]);
-                  if (todayTime) {
-                    localStorage[OTHER + ADDON.today] = todayTime + UPDATE_INTERVAL;
-                  } else {
-                    localStorage[OTHER + ADDON.today] = UPDATE_INTERVAL;
-                  }
-                  // Time tracked for all time
-                  var totalTime = parseInt(localStorage[OTHER + ADDON.all]);
-                  if (totalTime) {
-                    localStorage[OTHER + ADDON.all] = totalTime + UPDATE_INTERVAL;
-                  } else {
-                    localStorage[OTHER + ADDON.all] = UPDATE_INTERVAL;
-                  }
+                  domain_data.today += UPDATE_INTERVAL;
+                  domain_data.all += UPDATE_INTERVAL;
+                  localStorage[domain] = JSON.stringify(domain_data);
                 }
               });
             }

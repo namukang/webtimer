@@ -69,7 +69,7 @@
           minute: 60,
           second: 1
         };
-        for (term in timeTerms) {
+        for (var term in timeTerms) {
           var divisor = timeTerms[term];
           if (remainder >= divisor) {
             var numUnits = Math.floor(remainder / divisor);
@@ -88,61 +88,67 @@
       }
 
       // Show the data for the time period indicated by addon
-      function show(addon) {
+      function show(type) {
         // Get the domain data
-        var domains = localStorage["domains"].split(/\n/);
-        // Add "other" category to domain data
-        domains.unshift(bg.OTHER);
-        var domain_data = [];
-        for (var i = 0; i < domains.length; i++) {
-          var domain = domains[i];
+        var domains = JSON.parse(localStorage["domains"]);
+        var chart_data = [];
+        for (var domain in domains) {
+          var domain_data = JSON.parse(localStorage[domain]);
           var numSeconds;
-          if (addon === bg.ADDON.average) {
-            numSeconds = parseInt(localStorage[domain + bg.ADDON.all]);
+          if (type === bg.TYPE.today) {
+            numSeconds = domain_data.today;
+          } else if (type === bg.TYPE.average) {
+            numSeconds = Math.floor(domain_data.all / parseInt(localStorage["num_days"]));
+          } else if (type === bg.TYPE.all) {
+            numSeconds = domain_data.all;
           } else {
-            numSeconds = parseInt(localStorage[domain + addon]);
+            console.error("No such type: " + type);
           }
-          if (numSeconds && numSeconds > 0) {
-            // Average the time if showing average data
-            if (addon === bg.ADDON.average) {
-              numSeconds = Math.floor(numSeconds / parseInt(localStorage["num_days"]));
-              // Don't show site if average is 0 seconds
-              if (numSeconds === 0) {
-                continue;
-              }
-            }
-            domain_data.push([domain, numSeconds]);
+          if (numSeconds > 0) {
+            chart_data.push([domain, numSeconds]);
           }
         }
 
-        // Display help message if no data or data is only for "other" category
-        var only_other = (domain_data.length === 1 && domain_data[0][0] === bg.OTHER);
-        if (domain_data.length === 0 || only_other) {
+        // Display help message if no data
+        if (chart_data.length === 0) {
           document.getElementById("nodata").style.display = "inline";
         } else {
           document.getElementById("nodata").style.display = "none";
         }
 
-        // Draw the chart
-        drawChart(domain_data);
-
-        // Sort data by descending duration before drawing table
-        domain_data.sort(function (a, b) {
+        // Sort data by descending duration
+        chart_data.sort(function (a, b) {
           return b[1] - a[1];
         });
+
+        // Limit chart data
+        var limited_data = [];
+        for (var i = 0; i < bg.CHART_LIMIT && i < chart_data.length; i++) {
+          limited_data.push(chart_data[i]);
+        }
+        var sum = 0;
+        for (var i = bg.CHART_LIMIT; i < chart_data.length; i++) {
+          sum += chart_data[i][1];
+        }
+        if (sum > 0) {
+          limited_data.push(["Other", sum]);
+        }
+
+        // Draw the chart
+        drawChart(limited_data);
+
         // Convert chart data to table data
-        for (var i = 0; i < domain_data.length; i++) {
-          var numSeconds = domain_data[i][1];
-          domain_data[i][1] = timeString(numSeconds);
+        for (var i = 0; i < limited_data.length; i++) {
+          var numSeconds = limited_data[i][1];
+          limited_data[i][1] = timeString(numSeconds);
         }
         // Draw the table
-        drawTable(domain_data, addon);
+        drawTable(limited_data, type);
       }
 
       function showToday() {
-        var addon = bg.ADDON.today;
         // Draw chart and table
-        show(addon);
+        show(bg.TYPE.today);
         // Update nav
         document.getElementById('today').className = 'active';
         document.getElementById('average').className = '';
@@ -150,9 +156,8 @@
       }
 
       function showAverage() {
-        var addon = bg.ADDON.average;
         // Draw chart and table
-        show(addon);
+        show(bg.TYPE.average);
         // Update nav
         document.getElementById('today').className = '';
         document.getElementById('average').className = 'active';
@@ -160,9 +165,8 @@
       }
 
       function showAllTime() {
-        var addon = bg.ADDON.all;
         // Draw chart and table
-        show(addon);
+        show(bg.TYPE.all);
         // Update nav
         document.getElementById('today').className = '';
         document.getElementById('average').className = '';
@@ -195,16 +199,18 @@
         chart.draw(data, options);
       }
 
-      function drawTable(table_data, addon) {
+      function drawTable(table_data, type) {
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Domain');
         var timeDesc;
-        if (addon === bg.ADDON.today) {
+        if (type === bg.TYPE.today) {
           timeDesc = "Today";
-        } else if (addon === bg.ADDON.average) {
+        } else if (type === bg.TYPE.average) {
           timeDesc = "Daily Average";
-        } else {
+        } else if (type === bg.TYPE.all) {
           timeDesc = "Total";
+        } else {
+          console.error("No such type: " + type);
         }
         data.addColumn('string', "Time Spent (" + timeDesc + ")");
         data.addRows(table_data);

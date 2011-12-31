@@ -50,7 +50,7 @@
       td {
           padding: 12px;
       }
-      #domains {
+      #blacklist {
           height: 15em;
           width: 25em;
       }
@@ -70,55 +70,38 @@
 
   // Saves options to localStorage.
   function save_options() {
-    var old_domains = localStorage["domains"].split(/\n/);
-    var new_domains = {};
-    // Save domains
-    var domainsEl = document.getElementById("domains");
-    var domains = domainsEl.value.split(/\r?\n/);
-    var saved_domains = [];
+    // Save blacklist domains
+    var blackListEl = document.getElementById("blacklist");
+    var blacklist_domains = blackListEl.value.split(/\r?\n/);
+    var blacklist = [];
     // Get rid of empty lines
-    for (var i = 0; i < domains.length; i++) {
-      var domain = domains[i];
+    for (var i = 0; i < blacklist_domains.length; i++) {
+      var domain = blacklist_domains[i];
       if (domain) {
-        saved_domains.push(domain);
-        new_domains[domain] = true;
+        blacklist.push(domain);
       }
     }
-    domainsEl.value = saved_domains.join('\n');
-    localStorage["domains"] = domainsEl.value;
+    blackListEl.value = blacklist.join('\n');
+    localStorage["blacklist"] = JSON.stringify(blacklist);
 
-    // Remove data for domains that were removed
-    for (var i = 0; i < old_domains.length; i++) {
-      var old_domain = old_domains[i];
-      if (!(old_domain in new_domains)) {
-        // Add times no longer being tracked to "other" category
-        var old_today = parseInt(localStorage[old_domain + bg.ADDON.today]);
-        if (old_today) {
-          localStorage[bg.OTHER + bg.ADDON.today] =
-            parseInt(localStorage[bg.OTHER + bg.ADDON.today]) + old_today;
+    // Remove data for sites that have been added to the blacklist
+    var domains = JSON.parse(localStorage["domains"]);
+    for (var domain in domains) {
+      for (var i = 0; i < blacklist.length; i++) {
+        if (domain.match(blacklist[i])) {
+          // Remove data for any domain on the blacklist
+          delete domains[domain];
+          delete localStorage[domain];
+          localStorage["domains"] = JSON.stringify(domains);
         }
-        var old_all = parseInt(localStorage[old_domain + bg.ADDON.all]);
-        if (old_all) {
-          localStorage[bg.OTHER + bg.ADDON.all] =
-            parseInt(localStorage[bg.OTHER + bg.ADDON.all]) + old_all;
-        }
-        delete localStorage[old_domain + bg.ADDON.today];
-        delete localStorage[old_domain + bg.ADDON.all];
       }
     }
 
     // Check checkboxes for erasing data
-    var today_data = document.getElementById("today-data");
-    if (today_data.checked) {
-      resetData(bg.ADDON.today);
-      today_data.checked = false;
-    }
-    var all_data = document.getElementById("all-data");
-    if (all_data.checked) {
-      resetData(bg.ADDON.all);
-      // Reset data for average stats
-      localStorage["num_days"] = 1;
-      all_data.checked = false;
+    var clear_data = document.getElementById("clear-data");
+    if (clear_data.checked) {
+      clearData();
+      clear_data.checked = false;
     }
 
     // Update status to let user know options were saved.
@@ -133,23 +116,18 @@
 
   // Restores select box state to saved value from localStorage.
   function restore_options() {
-    var domains = localStorage["domains"];
-    var domainsEl = document.getElementById("domains");
-    if (!domains) {
-      default_domains = bg.DEFAULT_DOMAINS;
-      localStorage["domains"] = default_domains;
-      domains = default_domains;
-    }
-    domainsEl.value = domains;
+    var blacklist = JSON.parse(localStorage["blacklist"]);
+    var blackListEl = document.getElementById("blacklist");
+    blackListEl.value = blacklist.join('\n');
   }
-  function resetData(addon) {
-    var domains = localStorage["domains"].split(/\n/);
-    for (var i = 0; i < domains.length; i++) {
-      var domain = domains[i];
-      delete localStorage[domain + addon];
-    }
-    // Delete "other" category
-    delete localStorage[bg.OTHER + addon];
+
+  // Clear all data except for blacklist
+  function clearData() {
+    // Clear everything except for blacklist
+    var blacklist = localStorage["blacklist"];
+    localStorage.clear();
+    localStorage["blacklist"] = blacklist;
+    bg.setDefaults();
   }
   </script>
 
@@ -171,19 +149,16 @@
         <tbody>
           <tr>
             <th>
-            Sites to Track<br />
+            Sites to Ignore<br />
             (one per line)
             </th>
-            <td><textarea id="domains"></textarea></td>
+            <td><textarea id="blacklist"></textarea></td>
           </tr>
           <tr>
-            <th>Erase Data</th>
+            <th>Storage</th>
             <td>
-              <input id="today-data" type="checkbox" />
-              <label for="today-data">Erase Data for Today</label>
-              <br />
-              <input id="all-data" type="checkbox" />
-              <label for="all-data">Erase Data for Average and All Time</label>
+              <input id="clear-data" type="checkbox" />
+              <label for="clear-data">Clear All Data</label>
             </td>
         </tbody>
       </table>
