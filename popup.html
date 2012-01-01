@@ -123,11 +123,12 @@
 
         // Limit chart data
         var limited_data = [];
-        for (var i = 0; i < bg.CHART_LIMIT && i < chart_data.length; i++) {
+        var chart_limit = parseInt(localStorage["chart_limit"]);
+        for (var i = 0; i < chart_limit && i < chart_data.length; i++) {
           limited_data.push(chart_data[i]);
         }
         var sum = 0;
-        for (var i = bg.CHART_LIMIT; i < chart_data.length; i++) {
+        for (var i = chart_limit; i < chart_data.length; i++) {
           sum += chart_data[i][1];
         }
         if (sum > 0) {

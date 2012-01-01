@@ -8,8 +8,6 @@
       average: "average",
       all: "all"
     };
-    // Number of items to show in chart
-    var CHART_LIMIT = 7;
 
     setDefaults();
     // Set default settings
@@ -29,6 +27,10 @@
       // Set domains seen before
       if (!localStorage["domains"]) {
         localStorage["domains"] = JSON.stringify({});
+      }
+      // Limit how many sites the chart shows
+      if (!localStorage["chart_limit"]) {
+        localStorage["chart_limit"] = 7;
       }
     }
 
@@ -78,6 +80,10 @@
         localStorage.clear();
         setDefaults();
         localStorage["version"] = "1.2.0";
+      }
+      // Limit how many sites the chart shows
+      if (!localStorage["chart_limit"]) {
+        localStorage["chart_limit"] = 7;
       }
       // Only count time if Chrome has focus
       chrome.windows.getLastFocused(function (window) {

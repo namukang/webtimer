@@ -1,6 +1,6 @@
 {
   "name": "Web Timer",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Keep track of how you spend your time on the web.",
   "icons": { "128": "icon_128.png" },
   "background_page": "background.html",

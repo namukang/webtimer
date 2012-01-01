@@ -50,6 +50,12 @@
       td {
           padding: 12px;
       }
+      .description {
+          visibility: hidden;
+          width: 20em;
+          font-style: italic;
+          color: #777;
+      }
       #blacklist {
           height: 15em;
           width: 25em;
@@ -97,6 +103,16 @@
       }
     }
 
+    // Check limit data
+    var limit_data = document.getElementById("chart_limit");
+    var limit = parseInt(limit_data.value);
+    if (limit) {
+      localStorage["chart_limit"] = limit;
+      limit_data.value = limit;
+    } else {
+      limit_data.value = localStorage["chart_limit"];
+    }
+
     // Check checkboxes for erasing data
     var clear_data = document.getElementById("clear-data");
     if (clear_data.checked) {
@@ -119,6 +135,8 @@
     var blacklist = JSON.parse(localStorage["blacklist"]);
     var blackListEl = document.getElementById("blacklist");
     blackListEl.value = blacklist.join('\n');
+    var limitEl = document.getElementById("chart_limit");
+    limitEl.value = localStorage["chart_limit"];
   }
 
   // Clear all data except for blacklist
@@ -147,19 +165,33 @@
     <div id="settings">
       <table>
         <tbody>
-          <tr>
+          <tr onmouseover='document.getElementById("blacklist-description").style.visibility = "visible"'
+              onmouseout='document.getElementById("blacklist-description").style.visibility = "hidden"'>
             <th>
             Sites to Ignore<br />
             (one per line)
             </th>
             <td><textarea id="blacklist"></textarea></td>
+            <td id="blacklist-description" class="description">Web Timer will not track any sites you put on this list.</td>
           </tr>
-          <tr>
+          <tr onmouseover='document.getElementById("limit-description").style.visibility = "visible"'
+              onmouseout='document.getElementById("limit-description").style.visibility = "hidden"'>
+            <th>Chart Display Limit</th>
+            <td>
+              <label>Show Top</label>
+              <input id="chart_limit" type="text" size="2" maxlength="2" />
+              <label>Sites</label>
+            </td>
+            <td id="limit-description" class="description">Sites below the limit will be grouped into the "Other" category.</td>
+          </tr>
+          <tr onmouseover='document.getElementById("storage-description").style.visibility = "visible"'
+              onmouseout='document.getElementById("storage-description").style.visibility = "hidden"'>
             <th>Storage</th>
             <td>
               <input id="clear-data" type="checkbox" />
               <label for="clear-data">Clear All Data</label>
             </td>
+            <td id="storage-description" class="description">There is no way to recover your data once you delete it.</td>
         </tbody>
       </table>
     </div>
