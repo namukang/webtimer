@@ -69,6 +69,12 @@
           minute: 60,
           second: 1
         };
+        // Don't show seconds if time is more than one hour
+        if (remainder >= timeTerms.hour) {
+          remainder = remainder - (remainder % timeTerms.minute);
+          delete timeTerms.second;
+        }
+        // Construct the time string
         for (var term in timeTerms) {
           var divisor = timeTerms[term];
           if (remainder >= divisor) {
