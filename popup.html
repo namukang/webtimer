@@ -94,7 +94,7 @@
         var chart_data = [];
         for (var domain in domains) {
           var domain_data = JSON.parse(localStorage[domain]);
-          var numSeconds;
+          var numSeconds = 0;
           if (type === bg.TYPE.today) {
             numSeconds = domain_data.today;
           } else if (type === bg.TYPE.average) {
@@ -105,7 +105,13 @@
             console.error("No such type: " + type);
           }
           if (numSeconds > 0) {
-            chart_data.push([domain, numSeconds]);
+            chart_data.push([domain, {
+              v: numSeconds,
+              f: timeString(numSeconds),
+              p: {
+                style: "text-align: left;"
+              }
+            }]);
           }
         }
 
@@ -118,7 +124,7 @@
 
         // Sort data by descending duration
         chart_data.sort(function (a, b) {
-          return b[1] - a[1];
+          return b[1].v - a[1].v;
         });
 
         // Limit chart data
@@ -129,20 +135,46 @@
         }
         var sum = 0;
         for (var i = chart_limit; i < chart_data.length; i++) {
-          sum += chart_data[i][1];
+          sum += chart_data[i][1].v;
         }
         if (sum > 0) {
-          limited_data.push(["Other", sum]);
+          limited_data.push(["Other", {
+            v: sum,
+            f: timeString(sum),
+            p: {
+              style: "text-align: left;"
+            }
+          }]);
         }
 
         // Draw the chart
         drawChart(limited_data);
 
-        // Convert chart data to table data
-        for (var i = 0; i < limited_data.length; i++) {
-          var numSeconds = limited_data[i][1];
-          limited_data[i][1] = timeString(numSeconds);
+        // Add total time
+        var total = JSON.parse(localStorage["total"]);
+        var numSeconds = 0;
+        if (type === bg.TYPE.today) {
+          numSeconds = total.today;
+        } else if (type === bg.TYPE.average) {
+          numSeconds = Math.floor(total.all / parseInt(localStorage["num_days"]));
+        } else if (type === bg.TYPE.all) {
+          numSeconds = total.all;
+        } else {
+          console.error("No such type: " + type);
         }
+        limited_data.push([{
+          v: "Total",
+          p: {
+            style: "font-weight: bold;"
+          }
+        }, {
+          v: numSeconds,
+          f: timeString(numSeconds),
+          p: {
+            style: "text-align: left; font-weight: bold;"
+          }
+        }]);
+
         // Draw the table
         drawTable(limited_data, type);
       }
@@ -213,10 +245,11 @@
         } else {
           console.error("No such type: " + type);
         }
-        data.addColumn('string', "Time Spent (" + timeDesc + ")");
+        data.addColumn('number', "Time Spent (" + timeDesc + ")");
         data.addRows(table_data);
 
         var options = {
+          allowHtml: true,
           sort: 'disable'
         }
         var table = new google.visualization.Table(document.getElementById('table_div'));

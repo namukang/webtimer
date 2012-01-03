@@ -27,10 +27,39 @@
       // Set domains seen before
       if (!localStorage["domains"]) {
         localStorage["domains"] = JSON.stringify({});
+      } else {
+        // FIXME: Remove me!
+        setTotalTime();
+      }
+      // Set total time spent
+      if (!localStorage["total"]) {
+        localStorage["total"] = JSON.stringify({
+          today: 0,
+          all: 0
+        });
       }
       // Limit how many sites the chart shows
       if (!localStorage["chart_limit"]) {
         localStorage["chart_limit"] = 7;
+      }
+    }
+
+    // FIXME: Remove me!
+    function setTotalTime() {
+      if (!localStorage["total"]) {
+        var total_today = 0;
+        var total_all = 0;
+        var domains = JSON.parse(localStorage["domains"]);
+        for (var domain in domains) {
+          var domain_data = JSON.parse(localStorage[domain]);
+          total_today += domain_data.today;
+          total_all += domain_data.all;
+        }
+        var total = {
+          today: total_today,
+          all: total_all
+        };
+        localStorage["total"] = JSON.stringify(total);
       }
     }
 
@@ -105,6 +134,11 @@
                   domain_data.today += UPDATE_INTERVAL;
                   domain_data.all += UPDATE_INTERVAL;
                   localStorage[domain] = JSON.stringify(domain_data);
+                  // Update total time
+                  var total = JSON.parse(localStorage["total"]);
+                  total.today += UPDATE_INTERVAL;
+                  total.all += UPDATE_INTERVAL;
+                  localStorage["total"] = JSON.stringify(total);
                 }
               });
             }
