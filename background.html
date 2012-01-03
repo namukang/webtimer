@@ -75,16 +75,6 @@
 
     // Update the data
     function updateData() {
-      // FIXME: REMOVE ME!
-      if (!localStorage["version"]) {
-        localStorage.clear();
-        setDefaults();
-        localStorage["version"] = "1.2.2";
-      }
-      // Limit how many sites the chart shows
-      if (!localStorage["chart_limit"]) {
-        localStorage["chart_limit"] = 7;
-      }
       // Only count time if Chrome has focus
       chrome.windows.getLastFocused(function (window) {
         if (window.focused) {
