@@ -46,21 +46,19 @@
 
     // FIXME: Remove me!
     function setTotalTime() {
-      if (!localStorage["total"]) {
-        var total_today = 0;
-        var total_all = 0;
-        var domains = JSON.parse(localStorage["domains"]);
-        for (var domain in domains) {
-          var domain_data = JSON.parse(localStorage[domain]);
-          total_today += domain_data.today;
-          total_all += domain_data.all;
-        }
-        var total = {
-          today: total_today,
-          all: total_all
-        };
-        localStorage["total"] = JSON.stringify(total);
+      var total_today = 0;
+      var total_all = 0;
+      var domains = JSON.parse(localStorage["domains"]);
+      for (var domain in domains) {
+        var domain_data = JSON.parse(localStorage[domain]);
+        total_today += domain_data.today;
+        total_all += domain_data.all;
       }
+      var total = {
+        today: total_today,
+        all: total_all
+      };
+      localStorage["total"] = JSON.stringify(total);
     }
 
     // Check to make sure data is kept for the same day
@@ -75,6 +73,10 @@
           domain_data.today = 0;
           localStorage[domain] = JSON.stringify(domain_data);
         }
+        // Reset total for today
+        var total = JSON.parse(localStorage["total"]);
+        total.today = 0;
+        localStorage["total"] = JSON.stringify(total);
         // Keep track of number of days web timer has been used
         localStorage["num_days"] = parseInt(localStorage["num_days"]) + 1;
         // Update date
