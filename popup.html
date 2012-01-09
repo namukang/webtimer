@@ -254,7 +254,7 @@
         } else if (type === bg.TYPE.average) {
           timeDesc = "Daily Average";
         } else if (type === bg.TYPE.all) {
-          timeDesc = "Total";
+          timeDesc = "Over " + localStorage["num_days"] + " Days";
         } else {
           console.error("No such type: " + type);
         }
