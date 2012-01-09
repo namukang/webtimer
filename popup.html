@@ -143,6 +143,13 @@
         for (var i = chart_limit; i < chart_data.length; i++) {
           sum += chart_data[i][1].v;
         }
+        // Add time in "other" category for total and average
+        var other = JSON.parse(localStorage["other"]);
+        if (type === bg.TYPE.average) {
+          sum += Math.floor(other.all / parseInt(localStorage["num_days"]));
+        } else if (type === bg.TYPE.all) {
+          sum += other.all;
+        }
         if (sum > 0) {
           limited_data.push(["Other", {
             v: sum,
