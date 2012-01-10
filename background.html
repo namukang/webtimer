@@ -115,8 +115,8 @@
       // Only count time if Chrome has focus
       chrome.windows.getLastFocused(function (window) {
         if (window.focused) {
-          // Only count time if system has not been idle for 60 seconds
-          chrome.idle.queryState(60, function (state) {
+          // Only count time if system has not been idle for 30 seconds
+          chrome.idle.queryState(30, function (state) {
             if (state === "active") {
               chrome.tabs.getSelected(null, function (tab) {
                 // Make sure 'today' is up-to-date
