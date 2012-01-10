@@ -55,7 +55,7 @@
       var other = JSON.parse(localStorage["other"]);
       for (var domain in domains) {
         var domain_data = JSON.parse(localStorage[domain]);
-        if (domain_data.all < 60) {
+        if (domain_data.all < threshold) {
           other.all += domain_data.all;
           delete localStorage[domain];
           delete domains[domain];
