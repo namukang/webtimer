@@ -16,11 +16,15 @@
       a:focus {
           outline: none;
       }
-      #options {
-          font-weight: bold;
-          font-size: 10px;
+      #settings {
+          float: left;
+          margin-top: -1px;
+          font-size: 12px;
       }
-      #options:hover {
+      #settings a {
+          font-weight: bold;
+      }
+      #settings a:hover {
           text-decoration: underline;
       }
       #data {
@@ -47,6 +51,7 @@
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
       var bg = chrome.extension.getBackgroundPage();
+      var mode = bg.TYPE.today;
 
       // Load the Visualization API and the piechart package.
       google.load('visualization', '1.0', {'packages':['corechart', 'table']});
@@ -97,7 +102,8 @@
       }
 
       // Show the data for the time period indicated by addon
-      function show(type) {
+      function show() {
+        var type = mode;
         // Get the domain data
         var domains = JSON.parse(localStorage["domains"]);
         var chart_data = [];
@@ -196,8 +202,9 @@
       }
 
       function showToday() {
+        mode = bg.TYPE.today;
         // Draw chart and table
-        show(bg.TYPE.today);
+        show();
         // Update nav
         document.getElementById('today').className = 'active';
         document.getElementById('average').className = '';
@@ -205,8 +212,9 @@
       }
 
       function showAverage() {
+        mode = bg.TYPE.average;
         // Draw chart and table
-        show(bg.TYPE.average);
+        show();
         // Update nav
         document.getElementById('today').className = '';
         document.getElementById('average').className = 'active';
@@ -214,15 +222,16 @@
       }
 
       function showAllTime() {
+        mode = bg.TYPE.all;
         // Draw chart and table
-        show(bg.TYPE.all);
+        show();
         // Update nav
         document.getElementById('today').className = '';
         document.getElementById('average').className = '';
         document.getElementById('all').className = 'active';
       }
 
-      // Callback that creates and populates a data table, 
+      // Callback that creates and populates a data table,
       // instantiates the pie chart, passes in the data and
       // draws it.
       function drawChart(chart_data) {
@@ -271,6 +280,15 @@
         var table = new google.visualization.Table(document.getElementById('table_div'));
         table.draw(data, options);
       }
+
+function share() {
+  // chrome.tabs.captureVisibleTab(null, {"format":"png"}, function (imgUrl) {
+  //   console.log(imgUrl);
+  // });
+  chrome.tabs.create({
+    url: 'share.html'
+  });
+}
     </script>
   </head>
 
@@ -282,7 +300,12 @@
       &nbsp;|&nbsp;
       <a id="all" onclick="showAllTime()" href="#">All Time</a>
     </div>
-    <a id="options" onclick="showOptions()" href="#">Options</a>
+    <div id="settings">
+      <a id="options" onclick="showOptions()" href="#">Options</a>
+      &nbsp;|&nbsp;
+      <a id="share" onclick="share()" href="#">Share</a>
+    </div>
+    <div style="clear:both"></div>
     <div id="data">
       <span id="nodata">Start browsing to collect usage data.</span>
       <div id="chart_div"></div>

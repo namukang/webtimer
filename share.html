@@ -1,0 +1,42 @@
+<html>
+  <head>
+    <style type="text/css">
+    body {
+        margin-top: 40px;
+        font-family: helvetica, arial, sans-serif;
+    }
+    h1 {
+        display: inline-block;
+    }
+    img {
+        margin-bottom: -10px;
+        padding-right: 10px;
+    }
+    #title {
+        width: 240px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    iframe {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 10px;
+        border: 1px solid black;
+    }
+    </style>
+    <script type="text/javascript">
+  window.onload = function () {
+    var iframe = document.getElementsByTagName("iframe")[0];
+    iframe.contentWindow.document.getElementById("settings").style.visibility = "hidden";
+  }
+    </script>
+  </head>
+  <body>
+    <div id="title">
+      <img src="icon_128.png" width="50" height="50"></img>
+      <h1>Web Timer</h1>
+    </div>
+    <iframe src="popup.html" width="416" height="474" frameborder="0"></iframe>
+  </body>
+</html>
