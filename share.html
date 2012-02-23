@@ -26,10 +26,15 @@
     }
     </style>
     <script type="text/javascript">
-  window.onload = function () {
-    var iframe = document.getElementsByTagName("iframe")[0];
-    iframe.contentWindow.document.getElementById("settings").style.visibility = "hidden";
-  }
+      window.onload = function () {
+        // Hide settings in screenshot
+        var iframe = document.getElementsByTagName("iframe")[0];
+        iframe.contentWindow.document.getElementById("settings").style.visibility = "hidden";
+        // Take screenshot
+        chrome.tabs.captureVisibleTab(null, {"format":"png"}, function (imgUrl) {
+          console.log(imgUrl);
+        });
+      }
     </script>
   </head>
   <body>

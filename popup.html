@@ -51,12 +51,26 @@
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
       var bg = chrome.extension.getBackgroundPage();
-      var mode = bg.TYPE.today;
 
       // Load the Visualization API and the piechart package.
       google.load('visualization', '1.0', {'packages':['corechart', 'table']});
       // Set a callback to run when the Google Visualization API is loaded.
-      google.setOnLoadCallback(showToday);
+      if (top === self) {
+        google.setOnLoadCallback(showToday);
+      } else {
+        // For screenshot: if in iframe, load the most recently viewed mode
+        google.setOnLoadCallback(function () {
+          if (bg.mode === bg.TYPE.today) {
+            showToday();
+          } else if (bg.mode === bg.TYPE.average) {
+            showAverage();
+          } else if (bg.mode === bg.TYPE.all) {
+            showAllTime();
+          } else {
+            console.error("No such type: " + bg.mode)
+          }
+        });
+      }
 
       // Show options in a new tab
       function showOptions() {
@@ -102,8 +116,7 @@
       }
 
       // Show the data for the time period indicated by addon
-      function show() {
-        var type = mode;
+      function show(type) {
         // Get the domain data
         var domains = JSON.parse(localStorage["domains"]);
         var chart_data = [];
@@ -201,34 +214,29 @@
         drawTable(limited_data, type);
       }
 
-      function showToday() {
-        mode = bg.TYPE.today;
-        // Draw chart and table
-        show();
-        // Update nav
-        document.getElementById('today').className = 'active';
+      function updateNav(type) {
+        document.getElementById('today').className = '';
         document.getElementById('average').className = '';
         document.getElementById('all').className = '';
+        document.getElementById(type).className = 'active';
+      }
+
+      function showToday() {
+        bg.mode = bg.TYPE.today;
+        show(bg.TYPE.today);
+        updateNav(bg.TYPE.today);
       }
 
       function showAverage() {
-        mode = bg.TYPE.average;
-        // Draw chart and table
-        show();
-        // Update nav
-        document.getElementById('today').className = '';
-        document.getElementById('average').className = 'active';
-        document.getElementById('all').className = '';
+        bg.mode = bg.TYPE.average;
+        show(bg.TYPE.average);
+        updateNav(bg.TYPE.average);
       }
 
       function showAllTime() {
-        mode = bg.TYPE.all;
-        // Draw chart and table
-        show();
-        // Update nav
-        document.getElementById('today').className = '';
-        document.getElementById('average').className = '';
-        document.getElementById('all').className = 'active';
+        bg.mode = bg.TYPE.all;
+        show(bg.TYPE.all);
+        updateNav(bg.TYPE.all);
       }
 
       // Callback that creates and populates a data table,
@@ -281,14 +289,11 @@
         table.draw(data, options);
       }
 
-function share() {
-  // chrome.tabs.captureVisibleTab(null, {"format":"png"}, function (imgUrl) {
-  //   console.log(imgUrl);
-  // });
-  chrome.tabs.create({
-    url: 'share.html'
-  });
-}
+      function share() {
+        chrome.tabs.create({
+          url: 'share.html'
+        });
+      }
     </script>
   </head>
 
