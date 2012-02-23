@@ -2,7 +2,7 @@
   <head>
     <style type="text/css">
     body {
-        margin-top: 40px;
+        width: 500px;
         font-family: helvetica, arial, sans-serif;
     }
     h1 {
@@ -31,9 +31,36 @@
         var iframe = document.getElementsByTagName("iframe")[0];
         iframe.contentWindow.document.getElementById("settings").style.visibility = "hidden";
         // Take screenshot
-        chrome.tabs.captureVisibleTab(null, {"format":"png"}, function (imgUrl) {
-          console.log(imgUrl);
-        });
+        // FIXME: Find a better way to make sure that the iframe has
+        // loaded and is included in the screenshot rather than
+        // waiting 1 second
+        window.setTimeout(function () {
+          chrome.tabs.captureVisibleTab(null, {"format":"png"}, function (dataUrl) {
+            // document.getElementById('result').src = dataUrl;
+            var img = dataUrl.split(",")[1];
+            // uploadImage(img);
+          });
+        }, 1000);
+      }
+      // Upload image to imgur
+      function uploadImage(img) {
+        var fd = new FormData();
+        fd.append("image", img);
+        fd.append("type", "base64");
+        fd.append("key", "c7e28d7e91fe90261185487c964f683f");
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://api.imgur.com/2/upload.json");
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            var url = JSON.parse(xhr.responseText).upload.links.original;
+            console.log(url);
+          } else {
+            var error = JSON.parse(xhr.responseText).error.message;
+            console.error(error);
+          }
+        }
+        xhr.send(fd);
       }
     </script>
   </head>
@@ -43,5 +70,6 @@
       <h1>Web Timer</h1>
     </div>
     <iframe src="popup.html" width="416" height="474" frameborder="0"></iframe>
+    <img id="result"></img>
   </body>
 </html>
