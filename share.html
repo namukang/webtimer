@@ -2,8 +2,11 @@
   <head>
     <style type="text/css">
     body {
-        width: 500px;
         font-family: helvetica, arial, sans-serif;
+    }
+    #main {
+        width: 500px;
+        float: left;
     }
     h1 {
         display: inline-block;
@@ -24,7 +27,36 @@
         padding: 10px;
         border: 1px solid black;
     }
+    #footer {
+        margin-left: auto;
+        margin-right: auto;
+        font-size: 12px;
+        width: 340px;
+        padding: 10px;
+        color: gray;
+    }
+    #footer a {
+        color: gray;
+        text-decoration: none;
+    }
+    #results {
+        float: left;
+    }
+    #share {
+        width: 400px;
+        padding: 15px;
+        border: 1px solid black;
+        display: none;
+    }
+    #error {
+        width: 400px;
+        padding: 15px;
+        border: 3px solid red;
+        display: none;
+    }
     </style>
+    <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript">
+    </script>
     <script type="text/javascript">
       window.onload = function () {
         // Hide settings in screenshot
@@ -32,13 +64,12 @@
         iframe.contentWindow.document.getElementById("settings").style.visibility = "hidden";
         // Take screenshot
         // FIXME: Find a better way to make sure that the iframe has
-        // loaded and is included in the screenshot rather than
+        // loaded and is included in the screenshot other than
         // waiting 1 second
         window.setTimeout(function () {
           chrome.tabs.captureVisibleTab(null, {"format":"png"}, function (dataUrl) {
-            // document.getElementById('result').src = dataUrl;
             var img = dataUrl.split(",")[1];
-            // uploadImage(img);
+            uploadImage(img);
           });
         }, 1000);
       }
@@ -54,22 +85,54 @@
         xhr.onload = function() {
           if (xhr.status === 200) {
             var url = JSON.parse(xhr.responseText).upload.links.original;
-            console.log(url);
+            document.getElementById("image_url").href = url;
+            document.getElementById("image_url").innerHTML = url;
+            document.getElementById("image_url").innerHTML = url;
+            document.getElementById("fb_share").href = createFBLink(url);
+            document.getElementById("share").style.display = "block";
           } else {
             var error = JSON.parse(xhr.responseText).error.message;
-            console.error(error);
+            document.getElementById("error_msg").innerHTML = error;
+            document.getElementById("error").style.display = "block";
           }
         }
         xhr.send(fd);
       }
+
+      function createFBLink(share_url) {
+        var title = encodeURIComponent("Web Timer Stats");
+        var url = "https://www.facebook.com/sharer.php?u=";
+        url += encodeURIComponent(share_url);
+        url += "&t=" + title;
+        return url;
+      }
     </script>
   </head>
   <body>
-    <div id="title">
-      <img src="icon_128.png" width="50" height="50"></img>
-      <h1>Web Timer</h1>
+    <div id="main">
+      <div id="title">
+        <img src="icon_128.png" width="50" height="50"></img>
+        <h1>Web Timer</h1>
+      </div>
+      <iframe src="popup.html" width="416" height="474" frameborder="0"></iframe>
+      <div id="footer">Keep track of your time using Web Timer:
+        <a target="_blank" href="http://goo.gl/uH4WX">http://goo.gl/uH4WX</a>
+      </div>
     </div>
-    <iframe src="popup.html" width="416" height="474" frameborder="0"></iframe>
-    <img id="result"></img>
+    <div id="results">
+      <!-- HTML trick for alignment -->
+      <h1 style="visibility:hidden;">.</h1>
+      <div id="error">
+        <span style="font-weight: bold">An error has occurred:</span>
+        <br /><br />
+        <span id="error_msg"></span>
+      </div>
+      <div id="share">
+        <span style="font-weight: bold">Link to image:</span>
+        <a id="image_url" target="_blank"><a>
+        <br /><br />
+        <a id="fb_share" name="fb_share" type="button">Share Your Web Timer Stats</a>
+      </div>
+    </div>
   </body>
 </html>
