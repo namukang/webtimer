@@ -58,9 +58,6 @@
       if (top === self) {
         google.setOnLoadCallback(showToday);
       } else {
-        // Always show 9 items in screenshots
-        var saved_limit = localStorage["chart_limit"];
-        localStorage["chart_limit"] = 9;
         // For screenshot: if in iframe, load the most recently viewed mode
         google.setOnLoadCallback(function () {
           if (bg.mode === bg.TYPE.today) {
@@ -72,8 +69,6 @@
           } else {
             console.error("No such type: " + bg.mode)
           }
-          // Restore chart limit
-          localStorage["chart_limit"] = saved_limit;
         });
       }
 
@@ -162,7 +157,13 @@
 
         // Limit chart data
         var limited_data = [];
-        var chart_limit = parseInt(localStorage["chart_limit"]);
+        var chart_limit;
+        // For screenshot: if in iframe, image should always have 9 items
+        if (top == self) {
+          chart_limit = parseInt(localStorage["chart_limit"]);
+        } else {
+          chart_limit = 9;
+        }
         for (var i = 0; i < chart_limit && i < chart_data.length; i++) {
           limited_data.push(chart_data[i]);
         }

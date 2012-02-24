@@ -42,19 +42,49 @@
     #results {
         float: left;
     }
-    #share {
+    #share , #error, #save {
         width: 400px;
         padding: 15px;
         border: 1px solid black;
         display: none;
     }
     #error {
-        width: 400px;
-        padding: 15px;
         border: 3px solid red;
-        display: none;
+    }
+    #save {
+        display: block;
+        border: none;
     }
     </style>
+    <style type="text/css">
+    #save_button {
+        -webkit-box-shadow:inset 0px 1px 0px 0px #f29c93;
+        box-shadow:inset 0px 1px 0px 0px #f29c93;
+        background:-webkit-gradient( linear, left top, left bottom,
+                                     color-stop(0.05, #fe1a00), color-stop(1, #ce0100) );
+        background-color:#fe1a00;
+        -webkit-border-radius:6px;
+        border-radius:6px;
+        border:1px solid #d83526;
+        display:inline-block;
+        color:#ffffff;
+        font-family:Arial;
+        font-size:15px;
+        font-weight:bold;
+        padding:6px 24px;
+        text-decoration:none;
+        text-shadow:1px 1px 0px #b23e35;
+    }
+    #save_button:hover {
+        background:-webkit-gradient( linear, left top, left bottom,
+                                     color-stop(0.05, #ce0100), color-stop(1, #fe1a00) );
+        background-color:#ce0100;
+    }
+    #save_button:active {
+        position:relative;
+        top:1px;
+    }
+      </style>
     <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript">
     </script>
     <script type="text/javascript">
@@ -62,20 +92,30 @@
         // Hide settings in screenshot
         var iframe = document.getElementById("popup");
         iframe.contentWindow.document.getElementById("settings").style.visibility = "hidden";
+      }
+      // Save image
+      function saveImage() {
+        // Hide button
+        var button = document.getElementById("save_button");
+        button.style.display = "none";
         // Disable looking at other views
+        var iframe = document.getElementById("popup");
         iframe.contentWindow.document.getElementById("today").onclick = null;
         iframe.contentWindow.document.getElementById("average").onclick = null;
         iframe.contentWindow.document.getElementById("all").onclick = null;
         // Take screenshot
-        // FIXME: Find a better way to make sure that the iframe has
-        // loaded and is included in the screenshot other than
-        // waiting 1 second
+        // FIXME: Find better way to insure that button is not
+        // included in screenshot other than timeout
         window.setTimeout(function () {
           chrome.tabs.captureVisibleTab(null, {"format":"png"}, function (dataUrl) {
+            // Show status message
+            button.innerHTML = "Uploading...";
+            button.onclick = null;
+            button.style.display = "inline-block";
             var img = dataUrl.split(",")[1];
             uploadImage(img);
           });
-        }, 1000);
+        }, 10);
       }
       // Upload image to imgur
       function uploadImage(img) {
@@ -87,6 +127,8 @@
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "http://api.imgur.com/2/upload.json");
         xhr.onload = function() {
+          // Hide status message
+          document.getElementById("save_button").style.display = "none";
           if (xhr.status === 200) {
             var url = JSON.parse(xhr.responseText).upload.links.original;
             document.getElementById("image_url").href = url;
@@ -136,6 +178,9 @@
         <a id="image_url" target="_blank"><a>
         <br /><br />
         <a id="fb_share" name="fb_share" type="button">Share Your Web Timer Stats</a>
+      </div>
+      <div id="save">
+        <a href="#" id="save_button" onclick="saveImage()">Save Image</a>
       </div>
     </div>
   </body>
