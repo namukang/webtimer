@@ -58,6 +58,9 @@
       if (top === self) {
         google.setOnLoadCallback(showToday);
       } else {
+        // Always show 9 items in screenshots
+        var saved_limit = localStorage["chart_limit"];
+        localStorage["chart_limit"] = 9;
         // For screenshot: if in iframe, load the most recently viewed mode
         google.setOnLoadCallback(function () {
           if (bg.mode === bg.TYPE.today) {
@@ -69,6 +72,8 @@
           } else {
             console.error("No such type: " + bg.mode)
           }
+          // Restore chart limit
+          localStorage["chart_limit"] = saved_limit;
         });
       }
 
