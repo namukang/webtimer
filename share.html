@@ -62,6 +62,10 @@
         // Hide settings in screenshot
         var iframe = document.getElementById("popup");
         iframe.contentWindow.document.getElementById("settings").style.visibility = "hidden";
+        // Disable looking at other views
+        iframe.contentWindow.document.getElementById("today").onclick = null;
+        iframe.contentWindow.document.getElementById("average").onclick = null;
+        iframe.contentWindow.document.getElementById("all").onclick = null;
         // Take screenshot
         // FIXME: Find a better way to make sure that the iframe has
         // loaded and is included in the screenshot other than
