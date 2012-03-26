@@ -85,8 +85,7 @@
         top:1px;
     }
       </style>
-    <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript">
-    </script>
+    <script src="http://static.ak.fbcdn.net/connect.php/js/FB.Share" type="text/javascript"></script>
     <script type="text/javascript">
       window.onload = function () {
         // Hide settings in screenshot
@@ -135,6 +134,8 @@
             document.getElementById("image_url").innerHTML = url;
             document.getElementById("image_url").innerHTML = url;
             document.getElementById("fb_share").href = createFBLink(url);
+            document.getElementById("twitter_share").setAttribute("data-url", url);
+            loadTwitterButton();
             document.getElementById("share").style.display = "block";
           } else {
             var error = JSON.parse(xhr.responseText).error.message;
@@ -151,6 +152,10 @@
         url += encodeURIComponent(share_url);
         url += "&t=" + title;
         return url;
+      }
+
+      function loadTwitterButton() {
+      !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="http://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
       }
     </script>
   </head>
@@ -178,6 +183,15 @@
         <a id="image_url" target="_blank"><a>
         <br /><br />
         <a id="fb_share" name="fb_share" type="button">Share Your Web Timer Stats</a>
+        <br /><br />
+        <a href="https://twitter.com/share"
+           class="twitter-share-button"
+           id="twitter_share"
+           data-counturl="https://chrome.google.com/webstore/detail/ggnjbdfgigejghknieofeahaknkjafim"
+           data-text="Check out how I use my time online!"
+           data-lang="en"
+           data-count="none"
+           data-hashtags="webtimer">Tweet Your Web Timer Stats</a>
       </div>
       <div id="save">
         <a href="#" id="save_button" onclick="saveImage()">Upload Stats</a>
