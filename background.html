@@ -149,6 +149,16 @@
                   total.today += UPDATE_INTERVAL;
                   total.all += UPDATE_INTERVAL;
                   localStorage["total"] = JSON.stringify(total);
+                  // Update badge with number of minutes spent on
+                  // current site
+                  chrome.browserAction.setBadgeText({
+                    text: Math.floor(domain_data.today / 60).toString()
+                  });
+                } else {
+                  // Clear badge
+                  chrome.browserAction.setBadgeText({
+                    text: ""
+                  });
                 }
               });
             }
