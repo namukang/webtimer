@@ -152,7 +152,7 @@
                   // Update badge with number of minutes spent on
                   // current site
                   chrome.browserAction.setBadgeText({
-                    text: Math.floor(domain_data.today / 60).toString()
+                    text: Math.floor(domain_data.today / 60).toString() + "m"
                   });
                 } else {
                   // Clear badge
