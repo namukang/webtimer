@@ -151,8 +151,12 @@
                   localStorage["total"] = JSON.stringify(total);
                   // Update badge with number of minutes spent on
                   // current site
+                  var num_min = Math.floor(domain_data.today / 60).toString();
+                  if (num_min.length < 4) {
+                    num_min += "m";
+                  }
                   chrome.browserAction.setBadgeText({
-                    text: Math.floor(domain_data.today / 60).toString() + "m"
+                    text: num_min
                   });
                 } else {
                   // Clear badge
