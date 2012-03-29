@@ -134,11 +134,17 @@
     function updateData() {
       // Only count time if Chrome has focus
       chrome.windows.getLastFocused(function (window) {
+        if (window === undefined) {
+          return;
+        }
         if (window.focused) {
           // Only count time if system has not been idle for 30 seconds
           chrome.idle.queryState(30, function (state) {
             if (state === "active") {
               chrome.tabs.getSelected(null, function (tab) {
+                if (tab === undefined) {
+                  return;
+                }
                 // Make sure 'today' is up-to-date
                 checkDate();
                 if (!inBlacklist(tab.url)) {
