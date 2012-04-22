@@ -1,0 +1,81 @@
+body {
+    margin: 15px;
+    font-family: helvetica, arial, sans-serif;
+    font-size: 13px;
+}
+
+#header {
+    padding: 1em;
+    padding-bottom: 2em;
+}
+
+#info {
+    float: right;
+}
+
+#info span {
+    margin-bottom: 10px;
+    float: right;
+}
+
+#header h1 {
+    display: inline;
+    font-size: 156%;
+    padding-bottom: 43px;
+    padding-left: 75px;
+    padding-top: 30px;
+    background: url(icon_128.png) no-repeat;
+    background-size: 50px;
+    background-position: 1px 18px;
+}
+
+#settings {
+    margin: 6px 6px 0 6px;
+    padding: 10px;
+    color: #333;
+    border: 1px solid #DEDEDE;
+    -webkit-border-radius: 5px 5px;
+}
+
+#settings table {
+    font-size: 13px;
+}
+
+th, td {
+    vertical-align: top;
+}
+
+th {
+    text-align: right;
+    font-weight: bold;
+    white-space: nowrap;
+    padding: 12px 24px 12px 12px;
+}
+
+td {
+    padding: 12px;
+}
+
+.description {
+    visibility: hidden;
+    width: 20em;
+    font-style: italic;
+    color: #777;
+}
+
+#blacklist {
+    height: 15em;
+    width: 25em;
+}
+
+#footer {
+    margin: 10px;
+}
+
+#status {
+    margin-left: 10px;
+}
+
+.success {
+    color: green;
+}

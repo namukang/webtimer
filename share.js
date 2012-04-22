@@ -1,72 +1,72 @@
 window.onload = function () {
-    // Hide settings in screenshot
-    var iframe = document.getElementById("popup");
-    iframe.contentWindow.document.getElementById("settings").style.visibility = "hidden";
+  // Hide settings in screenshot
+  var iframe = document.getElementById("popup");
+  iframe.contentWindow.document.getElementById("settings").style.visibility = "hidden";
 }
 
 // Save image
 function saveImage() {
-    // Hide button
-    var button = document.getElementById("save_button");
-    button.style.display = "none";
-    // Disable looking at other views
-    var iframe = document.getElementById("popup");
-    iframe.contentWindow.document.getElementById("today").onclick = null;
-    iframe.contentWindow.document.getElementById("average").onclick = null;
-    iframe.contentWindow.document.getElementById("all").onclick = null;
-    // Take screenshot
-    // FIXME: Find better way to insure that button is not
-    // included in screenshot other than timeout
-    window.setTimeout(function () {
-        chrome.tabs.captureVisibleTab(null, {"format":"png"}, function (dataUrl) {
-            // Show status message
-            button.innerHTML = "Uploading...";
-            button.onclick = null;
-            button.style.display = "inline-block";
-            var img = dataUrl.split(",")[1];
-            uploadImage(img);
-        });
-    }, 10);
+  // Hide button
+  var button = document.getElementById("save_button");
+  button.style.display = "none";
+  // Disable looking at other views
+  var iframe = document.getElementById("popup");
+  iframe.contentWindow.document.getElementById("today").onclick = null;
+  iframe.contentWindow.document.getElementById("average").onclick = null;
+  iframe.contentWindow.document.getElementById("all").onclick = null;
+  // Take screenshot
+  // FIXME: Find better way to ensure that button is not
+  // included in screenshot other than timeout
+  window.setTimeout(function () {
+    chrome.tabs.captureVisibleTab(null, {"format":"png"}, function (dataUrl) {
+      // Show status message
+      button.innerHTML = "Uploading...";
+      button.onclick = null;
+      button.style.display = "inline-block";
+      var img = dataUrl.split(",")[1];
+      uploadImage(img);
+    });
+  }, 10);
 }
 
 // Upload image to imgur
 function uploadImage(img) {
-    var fd = new FormData();
-    fd.append("image", img);
-    fd.append("type", "base64");
-    fd.append("key", "c7e28d7e91fe90261185487c964f683f");
+  var fd = new FormData();
+  fd.append("image", img);
+  fd.append("type", "base64");
+  fd.append("key", "c7e28d7e91fe90261185487c964f683f");
 
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://api.imgur.com/2/upload.json");
-    xhr.onload = function() {
-        // Hide status message
-        document.getElementById("save_button").style.display = "none";
-        if (xhr.status === 200) {
-            var url = JSON.parse(xhr.responseText).upload.links.original;
-            document.getElementById("image_url").href = url;
-            document.getElementById("image_url").innerHTML = url;
-            document.getElementById("image_url").innerHTML = url;
-            document.getElementById("fb_share").href = createFBLink(url);
-            document.getElementById("twitter_share").setAttribute("data-url", url);
-            loadTwitterButton();
-            document.getElementById("share").style.display = "block";
-        } else {
-            var error = JSON.parse(xhr.responseText).error.message;
-            document.getElementById("error_msg").innerHTML = error;
-            document.getElementById("error").style.display = "block";
-        }
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "http://api.imgur.com/2/upload.json");
+  xhr.onload = function() {
+    // Hide status message
+    document.getElementById("save_button").style.display = "none";
+    if (xhr.status === 200) {
+      var url = JSON.parse(xhr.responseText).upload.links.original;
+      document.getElementById("image_url").href = url;
+      document.getElementById("image_url").innerHTML = url;
+      document.getElementById("image_url").innerHTML = url;
+      document.getElementById("fb_share").href = createFBLink(url);
+      document.getElementById("twitter_share").setAttribute("data-url", url);
+      loadTwitterButton();
+      document.getElementById("share").style.display = "block";
+    } else {
+      var error = JSON.parse(xhr.responseText).error.message;
+      document.getElementById("error_msg").innerHTML = error;
+      document.getElementById("error").style.display = "block";
     }
-    xhr.send(fd);
+  }
+  xhr.send(fd);
 }
 
 function createFBLink(share_url) {
-    var title = encodeURIComponent("Web Timer Stats");
-    var url = "https://www.facebook.com/sharer.php?u=";
-    url += encodeURIComponent(share_url);
-    url += "&t=" + title;
-    return url;
+  var title = encodeURIComponent("Web Timer Stats");
+  var url = "https://www.facebook.com/sharer.php?u=";
+  url += encodeURIComponent(share_url);
+  url += "&t=" + title;
+  return url;
 }
 
 function loadTwitterButton() {
-    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="http://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+  !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="http://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
 }
