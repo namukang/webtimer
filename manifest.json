@@ -1,15 +1,18 @@
 {
+  "manifest_version": 2,
   "name": "Web Timer",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "description": "Keep track of how you spend your time on the web.",
   "icons": { "128": "icon_128.png" },
-  "background_page": "background.html",
+  "background": {
+    "scripts": ["background.js"]
+  },
   "permissions": [
     "idle",
     "tabs"
   ],
   "browser_action": {
-    "default_title": "",
+    "default_title": "Web Timer",
     "default_icon": "icon_19.png",
     "default_popup": "popup.html"
   },
