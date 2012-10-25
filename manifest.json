@@ -16,5 +16,6 @@
     "default_icon": "icon_19.png",
     "default_popup": "popup.html"
   },
-  "options_page": "options.html"
+  "options_page": "options.html",
+  "content_security_policy": "script-src 'self' https://www.google.com; object-src 'self'"
 }
