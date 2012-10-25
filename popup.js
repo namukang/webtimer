@@ -248,3 +248,12 @@ function share() {
     url: 'share.html'
   });
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelector('#today').addEventListener('click', showToday);
+  document.querySelector('#average').addEventListener('click', showAverage);
+  document.querySelector('#all').addEventListener('click', showAllTime);
+
+  document.querySelector('#options').addEventListener('click', showOptions);
+  document.querySelector('#share').addEventListener('click', share);
+});

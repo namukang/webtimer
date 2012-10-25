@@ -47,22 +47,24 @@
       }
     </style>
 
-    <!--Load the AJAX API-->
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <!-- Load the AJAX API -->
+    <script src="https://www.google.com/jsapi"></script>
+    <!-- Load popup script -->
+    <script src="popup.js"></script>
   </head>
 
   <body>
     <div id="nav">
-      <a id="today" onclick="showToday()" href="#">Today</a>
+      <a id="today" href="#">Today</a>
       &nbsp;|&nbsp;
-      <a id="average" onclick="showAverage()" href="#">Average</a>
+      <a id="average" href="#">Average</a>
       &nbsp;|&nbsp;
-      <a id="all" onclick="showAllTime()" href="#">All Time</a>
+      <a id="all" href="#">All Time</a>
     </div>
     <div id="settings">
-      <a id="options" onclick="showOptions()" href="#">Options</a>
+      <a id="options" href="#">Options</a>
       &nbsp;|&nbsp;
-      <a id="share" onclick="share()" href="#">Share</a>
+      <a id="share" href="#">Share</a>
     </div>
     <div style="clear:both"></div>
     <div id="data">
