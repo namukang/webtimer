@@ -56,10 +56,12 @@ function loadTwitterButton() {
   !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+window.onload = function() {
     // Hide settings in screenshot
   var iframe = document.getElementById("popup");
   iframe.contentWindow.document.getElementById("settings").style.visibility = "hidden";
+};
 
+document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('#save_button').addEventListener('click', saveImage);
 });
