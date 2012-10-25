@@ -145,7 +145,7 @@ function displayData(type) {
   if (type === bg.TYPE.today) {
     numSeconds = total.today;
   } else if (type === bg.TYPE.average) {
-    numSeconds = Math.floor(total.all / parseInt(localStorage["num_days"]));
+    numSeconds = Math.floor(total.all / parseInt(localStorage["num_days"], 10));
   } else if (type === bg.TYPE.all) {
     numSeconds = total.all;
   } else {
