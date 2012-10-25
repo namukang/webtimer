@@ -1,9 +1,3 @@
-window.onload = function () {
-  // Hide settings in screenshot
-  var iframe = document.getElementById("popup");
-  iframe.contentWindow.document.getElementById("settings").style.visibility = "hidden";
-}
-
 // Save image
 function saveImage() {
   // Hide button
@@ -46,7 +40,6 @@ function uploadImage(img) {
       document.getElementById("image_url").href = url;
       document.getElementById("image_url").innerHTML = url;
       document.getElementById("image_url").innerHTML = url;
-      document.getElementById("fb_share").href = createFBLink(url);
       document.getElementById("twitter_share").setAttribute("data-url", url);
       loadTwitterButton();
       document.getElementById("share").style.display = "block";
@@ -55,18 +48,18 @@ function uploadImage(img) {
       document.getElementById("error_msg").innerHTML = error;
       document.getElementById("error").style.display = "block";
     }
-  }
+  };
   xhr.send(fd);
 }
 
-function createFBLink(share_url) {
-  var title = encodeURIComponent("Web Timer Stats");
-  var url = "https://www.facebook.com/sharer.php?u=";
-  url += encodeURIComponent(share_url);
-  url += "&t=" + title;
-  return url;
+function loadTwitterButton() {
+  !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
 }
 
-function loadTwitterButton() {
-  !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="http://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
-}
+document.addEventListener('DOMContentLoaded', function () {
+    // Hide settings in screenshot
+  var iframe = document.getElementById("popup");
+  iframe.contentWindow.document.getElementById("settings").style.visibility = "hidden";
+
+  document.querySelector('#save_button').addEventListener('click', saveImage);
+});
