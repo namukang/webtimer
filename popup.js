@@ -4,16 +4,16 @@ var bg = chrome.extension.getBackgroundPage();
 google.load('visualization', '1.0', {'packages':['corechart', 'table']});
 // Set a callback to run when the Google Visualization API is loaded.
 if (top === self) {
-  google.setOnLoadCallback(showToday);
+  google.setOnLoadCallback(function() { show(bg.TYPE.today); });
 } else {
   // For screenshot: if in iframe, load the most recently viewed mode
   google.setOnLoadCallback(function () {
     if (bg.mode === bg.TYPE.today) {
-      showToday();
+      show(bg.TYPE.today);
     } else if (bg.mode === bg.TYPE.average) {
-      showAverage();
+      show(bg.TYPE.average);
     } else if (bg.mode === bg.TYPE.all) {
-      showAllTime();
+      show(bg.TYPE.all);
     } else {
       console.error("No such type: " + bg.mode);
     }
@@ -64,7 +64,7 @@ function timeString(numSeconds) {
 }
 
 // Show the data for the time period indicated by addon
-function show(type) {
+function displayData(type) {
   // Get the domain data
   var domains = JSON.parse(localStorage["domains"]);
   var chart_data = [];
@@ -175,22 +175,10 @@ function updateNav(type) {
   document.getElementById(type).className = 'active';
 }
 
-function showToday() {
-  bg.mode = bg.TYPE.today;
-  show(bg.TYPE.today);
-  updateNav(bg.TYPE.today);
-}
-
-function showAverage() {
-  bg.mode = bg.TYPE.average;
-  show(bg.TYPE.average);
-  updateNav(bg.TYPE.average);
-}
-
-function showAllTime() {
-  bg.mode = bg.TYPE.all;
-  show(bg.TYPE.all);
-  updateNav(bg.TYPE.all);
+function show(mode) {
+  bg.mode = mode;
+  displayData(mode);
+  updateNav(mode);
 }
 
 // Callback that creates and populates a data table,
@@ -250,9 +238,9 @@ function share() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  document.querySelector('#today').addEventListener('click', showToday);
-  document.querySelector('#average').addEventListener('click', showAverage);
-  document.querySelector('#all').addEventListener('click', showAllTime);
+  document.querySelector('#today').addEventListener('click', function() { show(bg.TYPE.today); });
+  document.querySelector('#average').addEventListener('click', function() { show(bg.TYPE.average); });
+  document.querySelector('#all').addEventListener('click', function() { show(bg.TYPE.all); });
 
   document.querySelector('#options').addEventListener('click', showOptions);
   document.querySelector('#share').addEventListener('click', share);
