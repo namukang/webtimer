@@ -3,11 +3,7 @@ function saveImage() {
   // Hide button
   var button = document.getElementById("save_button");
   button.style.display = "none";
-  // Disable looking at other views
-  var iframe = document.getElementById("popup");
-  iframe.contentWindow.document.getElementById("today").onclick = null;
-  iframe.contentWindow.document.getElementById("average").onclick = null;
-  iframe.contentWindow.document.getElementById("all").onclick = null;
+
   // Take screenshot
   // FIXME: Find better way to ensure that button is not
   // included in screenshot other than timeout
