@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="options.css" />
     <script src="options.js"></script>
   </head>
-  <body onload="restore_options()">
+  <body>
     <div id="header">
       <h1>Web Timer Options</h1>
       <div id="info">
@@ -21,8 +21,7 @@
     <div id="settings">
       <table>
         <tbody>
-          <tr onmouseover='document.getElementById("blacklist-description").style.visibility = "visible"'
-              onmouseout='document.getElementById("blacklist-description").style.visibility = "hidden"'>
+          <tr>
             <th>
             Sites to Ignore<br />
             (one per line)
@@ -30,8 +29,7 @@
             <td><textarea id="blacklist"></textarea></td>
             <td id="blacklist-description" class="description">Web Timer will not track any sites you put on this list. Any existing data for sites on the list will be removed.</td>
           </tr>
-          <tr onmouseover='document.getElementById("limit-description").style.visibility = "visible"'
-              onmouseout='document.getElementById("limit-description").style.visibility = "hidden"'>
+          <tr>
             <th>Chart Display Limit</th>
             <td>
               <label>Show Top</label>
@@ -40,8 +38,7 @@
             </td>
             <td id="limit-description" class="description">Sites below the limit will be grouped into the "Other" category.</td>
           </tr>
-          <tr onmouseover='document.getElementById("storage-description").style.visibility = "visible"'
-              onmouseout='document.getElementById("storage-description").style.visibility = "hidden"'>
+          <tr>
             <th>Storage</th>
             <td>
               <input id="clear-data" type="checkbox" />
@@ -52,7 +49,7 @@
       </table>
     </div>
     <div id="footer">
-      <button onclick="save_options()">Save</button>
+      <button id="save-button">Save</button>
       <span id="status"></span>
     </div>
   </body>

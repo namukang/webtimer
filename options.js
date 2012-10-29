@@ -73,3 +73,19 @@ function clearData() {
   localStorage["blacklist"] = blacklist;
   bg.setDefaults();
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Restore options
+  restore_options();
+
+  // Set handlers for option descriptions
+  document.querySelector('#save-button').addEventListener('click', save_options);
+  var rows = document.querySelectorAll('tr');
+  var mouseoverHandler = function() { this.querySelector('.description').style.visibility = "visible"; };
+  var mouseoutHandler = function() { this.querySelector('.description').style.visibility = "hidden"; };
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    row.addEventListener('mouseover', mouseoverHandler);
+    row.addEventListener('mouseout', mouseoutHandler);
+  }
+});
