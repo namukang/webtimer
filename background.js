@@ -130,62 +130,56 @@ function inBlacklist(url) {
 
 // Update the data
 function updateData() {
-  // Only count time if Chrome has focus
-  chrome.windows.getLastFocused(function (window) {
-    if (window === undefined) {
-      return;
-    }
-    if (window.focused) {
-      // Only count time if system has not been idle for 30 seconds
-      chrome.idle.queryState(30, function (state) {
-        if (state === "active") {
-          chrome.tabs.getSelected(null, function (tab) {
-            if (tab === undefined) {
-              return;
-            }
-            // Make sure 'today' is up-to-date
-            checkDate();
-            if (!inBlacklist(tab.url)) {
-              var domain = extractDomain(tab.url);
-              // Add domain to domain list if not already present
-              var domains = JSON.parse(localStorage["domains"]);
-              if (!(domain in domains)) {
-                // FIXME: Using object as hash set feels hacky
-                domains[domain] = 1;
-                localStorage["domains"] = JSON.stringify(domains);
-              }
-              var domain_data;
-              if (localStorage[domain]) {
-                domain_data = JSON.parse(localStorage[domain]);
-              } else {
-                domain_data = {
-                  today: 0,
-                  all: 0
-                };
-              }
-              domain_data.today += UPDATE_INTERVAL;
-              domain_data.all += UPDATE_INTERVAL;
-              localStorage[domain] = JSON.stringify(domain_data);
-              // Update total time
-              var total = JSON.parse(localStorage["total"]);
-              total.today += UPDATE_INTERVAL;
-              total.all += UPDATE_INTERVAL;
-              localStorage["total"] = JSON.stringify(total);
-              // Update badge with number of minutes spent on
-              // current site
-              var num_min = Math.floor(domain_data.today / 60).toString();
-              if (num_min.length < 4) {
-                num_min += "m";
-              }
-              chrome.browserAction.setBadgeText({
-                text: num_min
-              });
-            } else {
-              // Clear badge
-              chrome.browserAction.setBadgeText({
-                text: ""
-              });
-            }
+  // Only count time if system has not been idle for 30 seconds
+  chrome.idle.queryState(30, function (state) {
+    if (state === "active") {
+      // Select single active tab from focused window
+      chrome.tabs.query({ 'lastFocusedWindow': true, 'active': true }, function (tabs) {
+        if (tabs.length === 0) {
+          return;
+        }
+        var tab = tabs[0];
+        // Make sure 'today' is up-to-date
+        checkDate();
+        if (!inBlacklist(tab.url)) {
+          var domain = extractDomain(tab.url);
+          // Add domain to domain list if not already present
+          var domains = JSON.parse(localStorage["domains"]);
+          if (!(domain in domains)) {
+            // FIXME: Using object as hash set feels hacky
+            domains[domain] = 1;
+            localStorage["domains"] = JSON.stringify(domains);
+          }
+          var domain_data;
+          if (localStorage[domain]) {
+            domain_data = JSON.parse(localStorage[domain]);
+          } else {
+            domain_data = {
+              today: 0,
+              all: 0
+            };
+          }
+          domain_data.today += UPDATE_INTERVAL;
+          domain_data.all += UPDATE_INTERVAL;
+          localStorage[domain] = JSON.stringify(domain_data);
+          // Update total time
+          var total = JSON.parse(localStorage["total"]);
+          total.today += UPDATE_INTERVAL;
+          total.all += UPDATE_INTERVAL;
+          localStorage["total"] = JSON.stringify(total);
+          // Update badge with number of minutes spent on
+          // current site
+          var num_min = Math.floor(domain_data.today / 60).toString();
+          if (num_min.length < 4) {
+            num_min += "m";
+          }
+          chrome.browserAction.setBadgeText({
+            text: num_min
+          });
+        } else {
+          // Clear badge
+          chrome.browserAction.setBadgeText({
+            text: ""
           });
         }
       });
