@@ -39,13 +39,6 @@ function save_options() {
     limit_data.value = localStorage["chart_limit"];
   }
 
-  // Check checkboxes for erasing data
-  var clear_data = document.getElementById("clear-data");
-  if (clear_data.checked) {
-    clearData();
-    clear_data.checked = false;
-  }
-
   // Update status to let user know options were saved.
   var status = document.getElementById("status");
   status.innerHTML = "Options Saved.";
@@ -72,6 +65,7 @@ function clearData() {
   localStorage.clear();
   localStorage["blacklist"] = blacklist;
   bg.setDefaults();
+  location.reload();
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -80,6 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Set handlers for option descriptions
   document.querySelector('#save-button').addEventListener('click', save_options);
+  document.querySelector('#clear-data').addEventListener('click', clearData);
   var rows = document.querySelectorAll('tr');
   var mouseoverHandler = function() { this.querySelector('.description').style.visibility = "visible"; };
   var mouseoutHandler = function() { this.querySelector('.description').style.visibility = "hidden"; };
