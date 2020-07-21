@@ -17,5 +17,5 @@
     "default_popup": "popup.html"
   },
   "options_page": "options.html",
-  "content_security_policy": "script-src 'self' 'unsafe-eval' https://www.google.com https://platform.twitter.com; object-src 'self'"
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://www.gstatic.com https://www.google.com https://platform.twitter.com; object-src 'self'"
 }
