@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Web Timer",
-  "version": "1.4.8",
+  "version": "1.4.9",
   "description": "Keep track of how you spend your time on the web.",
   "icons": { "128": "icon_128.png" },
   "background": {
