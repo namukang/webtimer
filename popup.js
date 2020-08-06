@@ -1,15 +1,15 @@
 var bg = chrome.extension.getBackgroundPage();
 
 // Load the Visualization API and the piechart package.
-google.load("visualization", "1.0", { packages: ["corechart", "table"] });
+google.charts.load("current", { packages: ["corechart", "table"] });
 // Set a callback to run when the Google Visualization API is loaded.
-if (top === self) {
-  google.setOnLoadCallback(function () {
+if (window.top === window.self) {
+  google.charts.setOnLoadCallback(function () {
     show(bg.TYPE.today);
   });
 } else {
   // For screenshot: if in iframe, load the most recently viewed mode
-  google.setOnLoadCallback(function () {
+  google.charts.setOnLoadCallback(function () {
     if (bg.mode === bg.TYPE.today) {
       show(bg.TYPE.today);
     } else if (bg.mode === bg.TYPE.average) {
@@ -241,6 +241,8 @@ function drawTable(table_data, type) {
   var options = {
     allowHtml: true,
     sort: "disable",
+    width: "100%",
+    height: "100%",
   };
   var table = new google.visualization.Table(
     document.getElementById("table_div")
