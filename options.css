@@ -34,7 +34,7 @@ body {
   padding: 10px;
   color: #333;
   border: 1px solid #dedede;
-  -webkit-border-radius: 5px 5px;
+  border-radius: 5px 5px;
 }
 
 #settings table {
