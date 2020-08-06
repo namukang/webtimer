@@ -13,7 +13,7 @@ function save_options() {
       blacklist.push(domain);
     }
   }
-  blackListEl.value = blacklist.join('\n');
+  blackListEl.value = blacklist.join("\n");
   localStorage["blacklist"] = JSON.stringify(blacklist);
 
   // Remove data for sites that have been added to the blacklist
@@ -43,7 +43,7 @@ function save_options() {
   var status = document.getElementById("status");
   status.innerHTML = "Options Saved.";
   status.className = "success";
-  setTimeout(function() {
+  setTimeout(function () {
     status.innerHTML = "";
     status.className = "";
   }, 750);
@@ -53,7 +53,7 @@ function save_options() {
 function restore_options() {
   var blacklist = JSON.parse(localStorage["blacklist"]);
   var blackListEl = document.getElementById("blacklist");
-  blackListEl.value = blacklist.join('\n');
+  blackListEl.value = blacklist.join("\n");
   var limitEl = document.getElementById("chart_limit");
   limitEl.value = localStorage["chart_limit"];
 }
@@ -68,19 +68,25 @@ function clearData() {
   location.reload();
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener("DOMContentLoaded", function () {
   // Restore options
   restore_options();
 
   // Set handlers for option descriptions
-  document.querySelector('#save-button').addEventListener('click', save_options);
-  document.querySelector('#clear-data').addEventListener('click', clearData);
-  var rows = document.querySelectorAll('tr');
-  var mouseoverHandler = function() { this.querySelector('.description').style.visibility = "visible"; };
-  var mouseoutHandler = function() { this.querySelector('.description').style.visibility = "hidden"; };
+  document
+    .querySelector("#save-button")
+    .addEventListener("click", save_options);
+  document.querySelector("#clear-data").addEventListener("click", clearData);
+  var rows = document.querySelectorAll("tr");
+  var mouseoverHandler = function () {
+    this.querySelector(".description").style.visibility = "visible";
+  };
+  var mouseoutHandler = function () {
+    this.querySelector(".description").style.visibility = "hidden";
+  };
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
-    row.addEventListener('mouseover', mouseoverHandler);
-    row.addEventListener('mouseout', mouseoutHandler);
+    row.addEventListener("mouseover", mouseoverHandler);
+    row.addEventListener("mouseout", mouseoutHandler);
   }
 });

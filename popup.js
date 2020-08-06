@@ -1,10 +1,12 @@
 var bg = chrome.extension.getBackgroundPage();
 
 // Load the Visualization API and the piechart package.
-google.load('visualization', '1.0', {'packages':['corechart', 'table']});
+google.load("visualization", "1.0", { packages: ["corechart", "table"] });
 // Set a callback to run when the Google Visualization API is loaded.
 if (top === self) {
-  google.setOnLoadCallback(function() { show(bg.TYPE.today); });
+  google.setOnLoadCallback(function () {
+    show(bg.TYPE.today);
+  });
 } else {
   // For screenshot: if in iframe, load the most recently viewed mode
   google.setOnLoadCallback(function () {
@@ -23,7 +25,7 @@ if (top === self) {
 // Show options in a new tab
 function showOptions() {
   chrome.tabs.create({
-    url: 'options.html'
+    url: "options.html",
   });
 }
 
@@ -37,7 +39,7 @@ function timeString(numSeconds) {
   var timeTerms = {
     hour: 3600,
     minute: 60,
-    second: 1
+    second: 1,
   };
   // Don't show seconds if time is more than one hour
   if (remainder >= timeTerms.hour) {
@@ -74,20 +76,25 @@ function displayData(type) {
     if (type === bg.TYPE.today) {
       numSeconds = domain_data.today;
     } else if (type === bg.TYPE.average) {
-      numSeconds = Math.floor(domain_data.all / parseInt(localStorage["num_days"], 10));
+      numSeconds = Math.floor(
+        domain_data.all / parseInt(localStorage["num_days"], 10)
+      );
     } else if (type === bg.TYPE.all) {
       numSeconds = domain_data.all;
     } else {
       console.error("No such type: " + type);
     }
     if (numSeconds > 0) {
-      chart_data.push([domain, {
-        v: numSeconds,
-        f: timeString(numSeconds),
-        p: {
-          style: "text-align: left; white-space: normal;"
-        }
-      }]);
+      chart_data.push([
+        domain,
+        {
+          v: numSeconds,
+          f: timeString(numSeconds),
+          p: {
+            style: "text-align: left; white-space: normal;",
+          },
+        },
+      ]);
     }
   }
 
@@ -127,13 +134,16 @@ function displayData(type) {
     sum += other.all;
   }
   if (sum > 0) {
-    limited_data.push(["Other", {
-      v: sum,
-      f: timeString(sum),
-      p: {
-        style: "text-align: left; white-space: normal;"
-      }
-    }]);
+    limited_data.push([
+      "Other",
+      {
+        v: sum,
+        f: timeString(sum),
+        p: {
+          style: "text-align: left; white-space: normal;",
+        },
+      },
+    ]);
   }
 
   // Draw the chart
@@ -151,28 +161,31 @@ function displayData(type) {
   } else {
     console.error("No such type: " + type);
   }
-  limited_data.push([{
-    v: "Total",
-    p: {
-      style: "font-weight: bold;"
-    }
-  }, {
-    v: numSeconds,
-    f: timeString(numSeconds),
-    p: {
-      style: "text-align: left; white-space: normal; font-weight: bold;"
-    }
-  }]);
+  limited_data.push([
+    {
+      v: "Total",
+      p: {
+        style: "font-weight: bold;",
+      },
+    },
+    {
+      v: numSeconds,
+      f: timeString(numSeconds),
+      p: {
+        style: "text-align: left; white-space: normal; font-weight: bold;",
+      },
+    },
+  ]);
 
   // Draw the table
   drawTable(limited_data, type);
 }
 
 function updateNav(type) {
-  document.getElementById('today').className = '';
-  document.getElementById('average').className = '';
-  document.getElementById('all').className = '';
-  document.getElementById(type).className = 'active';
+  document.getElementById("today").className = "";
+  document.getElementById("average").className = "";
+  document.getElementById("all").className = "";
+  document.getElementById(type).className = "active";
 }
 
 function show(mode) {
@@ -187,29 +200,31 @@ function show(mode) {
 function drawChart(chart_data) {
   // Create the data table.
   var data = new google.visualization.DataTable();
-  data.addColumn('string', 'Domain');
-  data.addColumn('number', 'Time');
+  data.addColumn("string", "Domain");
+  data.addColumn("number", "Time");
   data.addRows(chart_data);
 
   // Set chart options
   var options = {
     tooltip: {
-      text: 'percentage'
+      text: "percentage",
     },
     chartArea: {
       width: 400,
-      height: 180
-    }
+      height: 180,
+    },
   };
 
   // Instantiate and draw our chart, passing in some options.
-  var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+  var chart = new google.visualization.PieChart(
+    document.getElementById("chart_div")
+  );
   chart.draw(data, options);
 }
 
 function drawTable(table_data, type) {
   var data = new google.visualization.DataTable();
-  data.addColumn('string', 'Domain');
+  data.addColumn("string", "Domain");
   var timeDesc;
   if (type === bg.TYPE.today) {
     timeDesc = "Today";
@@ -220,28 +235,36 @@ function drawTable(table_data, type) {
   } else {
     console.error("No such type: " + type);
   }
-  data.addColumn('number', "Time Spent (" + timeDesc + ")");
+  data.addColumn("number", "Time Spent (" + timeDesc + ")");
   data.addRows(table_data);
 
   var options = {
     allowHtml: true,
-    sort: 'disable'
+    sort: "disable",
   };
-  var table = new google.visualization.Table(document.getElementById('table_div'));
+  var table = new google.visualization.Table(
+    document.getElementById("table_div")
+  );
   table.draw(data, options);
 }
 
 function share() {
   chrome.tabs.create({
-    url: 'share.html'
+    url: "share.html",
   });
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-  document.querySelector('#today').addEventListener('click', function() { show(bg.TYPE.today); });
-  document.querySelector('#average').addEventListener('click', function() { show(bg.TYPE.average); });
-  document.querySelector('#all').addEventListener('click', function() { show(bg.TYPE.all); });
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelector("#today").addEventListener("click", function () {
+    show(bg.TYPE.today);
+  });
+  document.querySelector("#average").addEventListener("click", function () {
+    show(bg.TYPE.average);
+  });
+  document.querySelector("#all").addEventListener("click", function () {
+    show(bg.TYPE.all);
+  });
 
-  document.querySelector('#options').addEventListener('click', showOptions);
-  document.querySelector('#share').addEventListener('click', share);
+  document.querySelector("#options").addEventListener("click", showOptions);
+  document.querySelector("#share").addEventListener("click", share);
 });

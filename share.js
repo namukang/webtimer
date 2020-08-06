@@ -8,7 +8,7 @@ function saveImage() {
   // FIXME: Find better way to ensure that button is not
   // included in screenshot other than timeout
   window.setTimeout(function () {
-    chrome.tabs.captureVisibleTab(null, {"format":"png"}, function (dataUrl) {
+    chrome.tabs.captureVisibleTab(null, { format: "png" }, function (dataUrl) {
       // Show status message
       button.innerHTML = "Uploading...";
       button.onclick = null;
@@ -28,7 +28,7 @@ function uploadImage(img) {
 
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "http://api.imgur.com/2/upload.json");
-  xhr.onload = function() {
+  xhr.onload = function () {
     // Hide status message
     document.getElementById("save_button").style.display = "none";
     if (xhr.status === 200) {
@@ -49,15 +49,25 @@ function uploadImage(img) {
 }
 
 function loadTwitterButton() {
-  !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+  !(function (d, s, id) {
+    var js,
+      fjs = d.getElementsByTagName(s)[0];
+    if (!d.getElementById(id)) {
+      js = d.createElement(s);
+      js.id = id;
+      js.src = "https://platform.twitter.com/widgets.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }
+  })(document, "script", "twitter-wjs");
 }
 
-window.onload = function() {
-    // Hide settings in screenshot
+window.onload = function () {
+  // Hide settings in screenshot
   var iframe = document.getElementById("popup");
-  iframe.contentWindow.document.getElementById("settings").style.visibility = "hidden";
+  iframe.contentWindow.document.getElementById("settings").style.visibility =
+    "hidden";
 };
 
-document.addEventListener('DOMContentLoaded', function () {
-  document.querySelector('#save_button').addEventListener('click', saveImage);
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelector("#save_button").addEventListener("click", saveImage);
 });

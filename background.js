@@ -4,7 +4,7 @@ var UPDATE_INTERVAL = 3;
 var TYPE = {
   today: "today",
   average: "average",
-  all: "all"
+  all: "all",
 };
 // Current viewing mode
 var mode = TYPE.today;
@@ -32,7 +32,7 @@ function setDefaults() {
   if (!localStorage["total"]) {
     localStorage["total"] = JSON.stringify({
       today: 0,
-      all: 0
+      all: 0,
     });
   }
   // Limit how many sites the chart shows
@@ -44,7 +44,7 @@ function setDefaults() {
   if (!localStorage["other"]) {
     localStorage["other"] = JSON.stringify({
       today: 0,
-      all: 0
+      all: 0,
     });
   }
 }
@@ -66,7 +66,7 @@ function combineEntries(threshold) {
     var domain_data = JSON.parse(localStorage[domain]);
     data.push({
       domain: domain,
-      all: domain_data.all
+      all: domain_data.all,
     });
   }
   data.sort(function (a, b) {
@@ -134,7 +134,9 @@ function updateData() {
   chrome.idle.queryState(30, function (state) {
     if (state === "active") {
       // Select single active tab from focused window
-      chrome.tabs.query({ 'lastFocusedWindow': true, 'active': true }, function (tabs) {
+      chrome.tabs.query({ lastFocusedWindow: true, active: true }, function (
+        tabs
+      ) {
         if (tabs.length === 0) {
           return;
         }
@@ -156,7 +158,7 @@ function updateData() {
           } else {
             domain_data = {
               today: 0,
-              all: 0
+              all: 0,
             };
           }
           domain_data.today += UPDATE_INTERVAL;
@@ -174,12 +176,12 @@ function updateData() {
             num_min += "m";
           }
           chrome.browserAction.setBadgeText({
-            text: num_min
+            text: num_min,
           });
         } else {
           // Clear badge
           chrome.browserAction.setBadgeText({
-            text: ""
+            text: "",
           });
         }
       });
