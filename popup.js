@@ -250,12 +250,6 @@ function drawTable(table_data, type) {
   table.draw(data, options);
 }
 
-function share() {
-  chrome.tabs.create({
-    url: "share.html",
-  });
-}
-
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelector("#today").addEventListener("click", function () {
     show(bg.TYPE.today);
@@ -268,5 +262,4 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.querySelector("#options").addEventListener("click", showOptions);
-  document.querySelector("#share").addEventListener("click", share);
 });
