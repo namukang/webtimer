@@ -1,12 +1,16 @@
 var bg = chrome.extension.getBackgroundPage();
 
-// Define constants for type
-const TYPE = bg.TYPE;
+const VIEWS = {
+  today: "today",
+  average: "average",
+  all: "all",
+};
+
 let pieChart = null;
 
 // Set up initial display when document is loaded
 window.addEventListener("DOMContentLoaded", () => {
-  show(TYPE.today);
+  show(VIEWS.today);
 });
 
 // Show options in a new tab
@@ -65,13 +69,13 @@ function displayData(type) {
       for (var domain in domains) {
         var domain_data = domainItems[domain];
         var numSeconds = 0;
-        if (type === TYPE.today) {
+        if (type === VIEWS.today) {
           numSeconds = domain_data.today;
-        } else if (type === TYPE.average) {
+        } else if (type === VIEWS.average) {
           chrome.storage.local.get("num_days", function (items) {
             numSeconds = Math.floor(domain_data.all / items.num_days);
           });
-        } else if (type === TYPE.all) {
+        } else if (type === VIEWS.all) {
           numSeconds = domain_data.all;
         } else {
           console.error("No such type: " + type);
@@ -123,9 +127,9 @@ function displayData(type) {
         // Add time in "other" category for total and average
         chrome.storage.local.get(["other", "num_days"], function (items) {
           var other = items.other;
-          if (type === TYPE.average) {
+          if (type === VIEWS.average) {
             sum += Math.floor(other.all / items.num_days);
-          } else if (type === TYPE.all) {
+          } else if (type === VIEWS.all) {
             sum += other.all;
           }
           if (sum > 0) {
@@ -143,11 +147,11 @@ function displayData(type) {
           chrome.storage.local.get(["total", "num_days"], function (items) {
             var total = items.total;
             var numSeconds = 0;
-            if (type === TYPE.today) {
+            if (type === VIEWS.today) {
               numSeconds = total.today;
-            } else if (type === TYPE.average) {
+            } else if (type === VIEWS.average) {
               numSeconds = Math.floor(total.all / items.num_days);
-            } else if (type === TYPE.all) {
+            } else if (type === VIEWS.all) {
               numSeconds = total.all;
             } else {
               console.error("No such type: " + type);
@@ -249,16 +253,16 @@ function drawTable(table_data, type) {
 
   // Update the table header based on type
   let timeDesc;
-  if (type === TYPE.today) {
+  if (type === VIEWS.today) {
     timeDesc = "Today";
-  } else if (type === TYPE.average) {
+  } else if (type === VIEWS.average) {
     chrome.storage.local.get("num_days", function (items) {
       document.querySelector(
         "#dataTable th:last-child"
       ).textContent = `Time Spent (Daily Average)`;
     });
     timeDesc = "Daily Average";
-  } else if (type === TYPE.all) {
+  } else if (type === VIEWS.all) {
     chrome.storage.local.get("num_days", function (items) {
       document.querySelector(
         "#dataTable th:last-child"
@@ -294,13 +298,13 @@ function drawTable(table_data, type) {
 
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelector("#today").addEventListener("click", function () {
-    show(TYPE.today);
+    show(VIEWS.today);
   });
   document.querySelector("#average").addEventListener("click", function () {
-    show(TYPE.average);
+    show(VIEWS.average);
   });
   document.querySelector("#all").addEventListener("click", function () {
-    show(TYPE.all);
+    show(VIEWS.all);
   });
 
   document.querySelector("#options").addEventListener("click", showOptions);
