@@ -68,117 +68,137 @@ function timeString(numSeconds) {
 // Show the data for the time period indicated by addon
 function displayData(type) {
   // Get the domain data
-  var domains = JSON.parse(localStorage["domains"]);
-  var chart_data = [];
-  for (var domain in domains) {
-    var domain_data = JSON.parse(localStorage[domain]);
-    var numSeconds = 0;
-    if (type === bg.TYPE.today) {
-      numSeconds = domain_data.today;
-    } else if (type === bg.TYPE.average) {
-      numSeconds = Math.floor(
-        domain_data.all / parseInt(localStorage["num_days"], 10)
-      );
-    } else if (type === bg.TYPE.all) {
-      numSeconds = domain_data.all;
-    } else {
-      console.error("No such type: " + type);
-    }
-    if (numSeconds > 0) {
-      chart_data.push([
-        domain,
-        {
-          v: numSeconds,
-          f: timeString(numSeconds),
-          p: {
-            style: "text-align: left; white-space: normal;",
-          },
-        },
-      ]);
-    }
-  }
+  chrome.storage.local.get(["domains"], function (items) {
+    var domains = items.domains;
+    var chart_data = [];
 
-  // Display help message if no data
-  if (chart_data.length === 0) {
-    document.getElementById("nodata").style.display = "inline";
-  } else {
-    document.getElementById("nodata").style.display = "none";
-  }
+    // Get all domain data at once
+    var domainKeys = Object.keys(domains);
+    chrome.storage.local.get(domainKeys, function (domainItems) {
+      for (var domain in domains) {
+        var domain_data = domainItems[domain];
+        var numSeconds = 0;
+        if (type === bg.TYPE.today) {
+          numSeconds = domain_data.today;
+        } else if (type === bg.TYPE.average) {
+          chrome.storage.local.get("num_days", function (items) {
+            numSeconds = Math.floor(domain_data.all / items.num_days);
+          });
+        } else if (type === bg.TYPE.all) {
+          numSeconds = domain_data.all;
+        } else {
+          console.error("No such type: " + type);
+        }
+        if (numSeconds > 0) {
+          chart_data.push([
+            domain,
+            {
+              v: numSeconds,
+              f: timeString(numSeconds),
+              p: {
+                style: "text-align: left; white-space: normal;",
+              },
+            },
+          ]);
+        }
+      }
 
-  // Sort data by descending duration
-  chart_data.sort(function (a, b) {
-    return b[1].v - a[1].v;
+      // Display help message if no data
+      if (chart_data.length === 0) {
+        document.getElementById("nodata").style.display = "inline";
+      } else {
+        document.getElementById("nodata").style.display = "none";
+      }
+
+      // Sort data by descending duration
+      chart_data.sort(function (a, b) {
+        return b[1].v - a[1].v;
+      });
+
+      // Limit chart data
+      var limited_data = [];
+      var chart_limit;
+      // For screenshot: if in iframe, image should always have 9 items
+      if (top == self) {
+        chrome.storage.local.get("chart_limit", function (items) {
+          chart_limit = items.chart_limit;
+          processChartData();
+        });
+      } else {
+        chart_limit = 9;
+        processChartData();
+      }
+
+      function processChartData() {
+        for (var i = 0; i < chart_limit && i < chart_data.length; i++) {
+          limited_data.push(chart_data[i]);
+        }
+        var sum = 0;
+        for (var i = chart_limit; i < chart_data.length; i++) {
+          sum += chart_data[i][1].v;
+        }
+
+        // Add time in "other" category for total and average
+        chrome.storage.local.get(["other", "num_days"], function (items) {
+          var other = items.other;
+          if (type === bg.TYPE.average) {
+            sum += Math.floor(other.all / items.num_days);
+          } else if (type === bg.TYPE.all) {
+            sum += other.all;
+          }
+          if (sum > 0) {
+            limited_data.push([
+              "Other",
+              {
+                v: sum,
+                f: timeString(sum),
+                p: {
+                  style: "text-align: left; white-space: normal;",
+                },
+              },
+            ]);
+          }
+
+          // Draw the chart
+          drawChart(limited_data);
+
+          // Add total time
+          chrome.storage.local.get(["total", "num_days"], function (items) {
+            var total = items.total;
+            var numSeconds = 0;
+            if (type === bg.TYPE.today) {
+              numSeconds = total.today;
+            } else if (type === bg.TYPE.average) {
+              numSeconds = Math.floor(total.all / items.num_days);
+            } else if (type === bg.TYPE.all) {
+              numSeconds = total.all;
+            } else {
+              console.error("No such type: " + type);
+            }
+            limited_data.push([
+              {
+                v: "Total",
+                p: {
+                  style: "font-weight: bold;",
+                },
+              },
+              {
+                v: numSeconds,
+                f: timeString(numSeconds),
+                p: {
+                  style:
+                    "text-align: left; white-space: normal; font-weight: bold;",
+                },
+              },
+            ]);
+
+            // Draw the table
+            drawTable(limited_data, type);
+          });
+        });
+      }
+    });
   });
-
-  // Limit chart data
-  var limited_data = [];
-  var chart_limit;
-  // For screenshot: if in iframe, image should always have 9 items
-  if (top == self) {
-    chart_limit = parseInt(localStorage["chart_limit"], 10);
-  } else {
-    chart_limit = 9;
-  }
-  for (var i = 0; i < chart_limit && i < chart_data.length; i++) {
-    limited_data.push(chart_data[i]);
-  }
-  var sum = 0;
-  for (var i = chart_limit; i < chart_data.length; i++) {
-    sum += chart_data[i][1].v;
-  }
-  // Add time in "other" category for total and average
-  var other = JSON.parse(localStorage["other"]);
-  if (type === bg.TYPE.average) {
-    sum += Math.floor(other.all / parseInt(localStorage["num_days"], 10));
-  } else if (type === bg.TYPE.all) {
-    sum += other.all;
-  }
-  if (sum > 0) {
-    limited_data.push([
-      "Other",
-      {
-        v: sum,
-        f: timeString(sum),
-        p: {
-          style: "text-align: left; white-space: normal;",
-        },
-      },
-    ]);
-  }
-
-  // Draw the chart
-  drawChart(limited_data);
-
-  // Add total time
-  var total = JSON.parse(localStorage["total"]);
-  var numSeconds = 0;
-  if (type === bg.TYPE.today) {
-    numSeconds = total.today;
-  } else if (type === bg.TYPE.average) {
-    numSeconds = Math.floor(total.all / parseInt(localStorage["num_days"], 10));
-  } else if (type === bg.TYPE.all) {
-    numSeconds = total.all;
-  } else {
-    console.error("No such type: " + type);
-  }
-  limited_data.push([
-    {
-      v: "Total",
-      p: {
-        style: "font-weight: bold;",
-      },
-    },
-    {
-      v: numSeconds,
-      f: timeString(numSeconds),
-      p: {
-        style: "text-align: left; white-space: normal; font-weight: bold;",
-      },
-    },
-  ]);
-
-  // Draw the table
-  drawTable(limited_data, type);
 }
 
 function updateNav(type) {
@@ -229,9 +249,13 @@ function drawTable(table_data, type) {
   if (type === bg.TYPE.today) {
     timeDesc = "Today";
   } else if (type === bg.TYPE.average) {
-    timeDesc = "Daily Average";
+    chrome.storage.local.get("num_days", function (items) {
+      timeDesc = "Daily Average";
+    });
   } else if (type === bg.TYPE.all) {
-    timeDesc = "Over " + localStorage["num_days"] + " Days";
+    chrome.storage.local.get("num_days", function (items) {
+      timeDesc = "Over " + items.num_days + " Days";
+    });
   } else {
     console.error("No such type: " + type);
   }
