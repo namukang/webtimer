@@ -1,51 +1,9 @@
+import { setDefaultSettings } from "./utils.js";
+
+setDefaultSettings();
+
 // Interval (in seconds) to update timer
 var UPDATE_INTERVAL = 3;
-
-setDefaults();
-// Set default settings
-function setDefaults() {
-  chrome.storage.local.get(null, function (items) {
-    // Set blacklist
-    if (!items.blacklist) {
-      chrome.storage.local.set({ blacklist: ["example.com"] });
-    }
-    // Set number of days Web Timer has been used
-    if (!items.num_days) {
-      chrome.storage.local.set({ num_days: 1 });
-    }
-    // Set date
-    if (!items.date) {
-      chrome.storage.local.set({ date: new Date().toLocaleDateString() });
-    }
-    // Set domains seen before
-    if (!items.domains) {
-      chrome.storage.local.set({ domains: {} });
-    }
-    // Set total time spent
-    if (!items.total) {
-      chrome.storage.local.set({
-        total: {
-          today: 0,
-          all: 0,
-        },
-      });
-    }
-    // Limit how many sites the chart shows
-    if (!items.chart_limit) {
-      chrome.storage.local.set({ chart_limit: 7 });
-    }
-    // Set "other" category
-    // NOTE: other.today is not currently used
-    if (!items.other) {
-      chrome.storage.local.set({
-        other: {
-          today: 0,
-          all: 0,
-        },
-      });
-    }
-  });
-}
 
 // Add sites which are not in the top threshold sites to "other" category
 // WARNING: Setting the threshold too low will schew the data set
@@ -191,14 +149,14 @@ function updateData() {
                   if (num_min.length < 4) {
                     num_min += "m";
                   }
-                  chrome.browserAction.setBadgeText({
+                  chrome.action.setBadgeText({
                     text: num_min,
                   });
                 });
               });
             } else {
               // Clear badge
-              chrome.browserAction.setBadgeText({
+              chrome.action.setBadgeText({
                 text: "",
               });
             }
@@ -211,3 +169,13 @@ function updateData() {
 
 // Update timer data every UPDATE_INTERVAL seconds
 setInterval(updateData, UPDATE_INTERVAL * 1000);
+
+/**
+ * Call a Chrome API every 25 seconds to keep the service worker alive.
+ *
+ * Chrome normally terminates a service worker after 30 seconds of inactivity. Receiving an event or calling an extension API resets this timer.
+ */
+function keepAlive() {
+  setInterval(chrome.runtime.getPlatformInfo, 25 * 1000);
+}
+keepAlive();

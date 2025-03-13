@@ -1,5 +1,3 @@
-var bg = chrome.extension.getBackgroundPage();
-
 const VIEWS = {
   today: "today",
   average: "average",

@@ -1,4 +1,4 @@
-var bg = chrome.extension.getBackgroundPage();
+import { setDefaultSettings } from "./utils.js";
 
 // Saves options to chrome.storage.local
 function save_options() {
@@ -71,7 +71,7 @@ function clearData() {
     var blacklist = items.blacklist;
     chrome.storage.local.clear(function () {
       chrome.storage.local.set({ blacklist: blacklist }, function () {
-        bg.setDefaults();
+        setDefaultSettings();
         location.reload();
       });
     });

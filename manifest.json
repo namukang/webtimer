@@ -1,18 +1,18 @@
 {
-  "manifest_version": 2,
   "name": "Web Timer",
-  "version": "1.4.9",
   "description": "Keep track of how you spend your time on the web.",
+  "version": "1.5.0",
+  "manifest_version": 3,
   "icons": { "128": "icon_128.png" },
   "background": {
-    "scripts": ["background.js"]
+    "service_worker": "background.js",
+    "type": "module"
   },
   "permissions": ["idle", "tabs", "storage"],
-  "browser_action": {
+  "action": {
     "default_title": "Web Timer",
     "default_icon": "icon_19.png",
     "default_popup": "popup.html"
   },
-  "options_page": "options.html",
-  "content_security_policy": "script-src 'self' 'unsafe-eval' https://cdn.jsdelivr.net; object-src 'self'"
+  "options_page": "options.html"
 }
