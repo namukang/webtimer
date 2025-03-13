@@ -1,6 +1,6 @@
 var bg = chrome.extension.getBackgroundPage();
 
-// Saves options to localStorage.
+// Saves options to chrome.storage.local
 function save_options() {
   // Save blacklist domains
   var blackListEl = document.getElementById("blacklist");
@@ -14,29 +14,33 @@ function save_options() {
     }
   }
   blackListEl.value = blacklist.join("\n");
-  localStorage["blacklist"] = JSON.stringify(blacklist);
+  chrome.storage.local.set({ blacklist: blacklist });
 
   // Remove data for sites that have been added to the blacklist
-  var domains = JSON.parse(localStorage["domains"]);
-  for (var domain in domains) {
-    for (var i = 0; i < blacklist.length; i++) {
-      if (domain.match(blacklist[i])) {
-        // Remove data for any domain on the blacklist
-        delete domains[domain];
-        delete localStorage[domain];
-        localStorage["domains"] = JSON.stringify(domains);
+  chrome.storage.local.get("domains", function (items) {
+    var domains = items.domains;
+    for (var domain in domains) {
+      for (var i = 0; i < blacklist.length; i++) {
+        if (domain.match(blacklist[i])) {
+          // Remove data for any domain on the blacklist
+          delete domains[domain];
+          chrome.storage.local.remove(domain);
+          chrome.storage.local.set({ domains: domains });
+        }
       }
     }
-  }
+  });
 
   // Check limit data
   var limit_data = document.getElementById("chart_limit");
   var limit = parseInt(limit_data.value);
   if (limit) {
-    localStorage["chart_limit"] = limit;
+    chrome.storage.local.set({ chart_limit: limit });
     limit_data.value = limit;
   } else {
-    limit_data.value = localStorage["chart_limit"];
+    chrome.storage.local.get("chart_limit", function (items) {
+      limit_data.value = items.chart_limit;
+    });
   }
 
   // Update status to let user know options were saved.
@@ -49,23 +53,29 @@ function save_options() {
   }, 750);
 }
 
-// Restores select box state to saved value from localStorage.
+// Restores select box state to saved value from chrome.storage.local
 function restore_options() {
-  var blacklist = JSON.parse(localStorage["blacklist"]);
-  var blackListEl = document.getElementById("blacklist");
-  blackListEl.value = blacklist.join("\n");
-  var limitEl = document.getElementById("chart_limit");
-  limitEl.value = localStorage["chart_limit"];
+  chrome.storage.local.get(["blacklist", "chart_limit"], function (items) {
+    var blacklist = items.blacklist;
+    var blackListEl = document.getElementById("blacklist");
+    blackListEl.value = blacklist.join("\n");
+    var limitEl = document.getElementById("chart_limit");
+    limitEl.value = items.chart_limit;
+  });
 }
 
 // Clear all data except for blacklist
 function clearData() {
   // Clear everything except for blacklist
-  var blacklist = localStorage["blacklist"];
-  localStorage.clear();
-  localStorage["blacklist"] = blacklist;
-  bg.setDefaults();
-  location.reload();
+  chrome.storage.local.get("blacklist", function (items) {
+    var blacklist = items.blacklist;
+    chrome.storage.local.clear(function () {
+      chrome.storage.local.set({ blacklist: blacklist }, function () {
+        bg.setDefaults();
+        location.reload();
+      });
+    });
+  });
 }
 
 document.addEventListener("DOMContentLoaded", function () {

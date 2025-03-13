@@ -7,7 +7,7 @@
   "background": {
     "scripts": ["background.js"]
   },
-  "permissions": ["idle", "tabs"],
+  "permissions": ["idle", "tabs", "storage"],
   "browser_action": {
     "default_title": "Web Timer",
     "default_icon": "icon_19.png",
