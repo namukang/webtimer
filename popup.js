@@ -5,24 +5,9 @@ const TYPE = bg.TYPE;
 let pieChart = null;
 
 // Set up initial display when document is loaded
-if (window.top === window.self) {
-  document.addEventListener("DOMContentLoaded", function () {
-    show(TYPE.today);
-  });
-} else {
-  // For screenshot: if in iframe, load the most recently viewed mode
-  document.addEventListener("DOMContentLoaded", function () {
-    if (bg.mode === TYPE.today) {
-      show(TYPE.today);
-    } else if (bg.mode === TYPE.average) {
-      show(TYPE.average);
-    } else if (bg.mode === TYPE.all) {
-      show(TYPE.all);
-    } else {
-      console.error("No such type: " + bg.mode);
-    }
-  });
-}
+window.addEventListener("DOMContentLoaded", () => {
+  show(TYPE.today);
+});
 
 // Show options in a new tab
 function showOptions() {
@@ -193,7 +178,6 @@ function updateNav(type) {
 }
 
 function show(mode) {
-  bg.mode = mode;
   displayData(mode);
   updateNav(mode);
 }

@@ -6,8 +6,6 @@ var TYPE = {
   average: "average",
   all: "all",
 };
-// Current viewing mode
-var mode = TYPE.today;
 
 setDefaults();
 // Set default settings
